@@ -18,12 +18,7 @@ const App = () => {
         >
           Never lose track of time again!
         </Typography>
-        <Button
-          id="main-btn"
-          variant="contained"
-          onClick={handleClick}
-          color="secondary"
-        >
+        <Button variant="contained" onClick={handleClick}>
           Get Started
         </Button>
       </main>

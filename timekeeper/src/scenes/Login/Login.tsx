@@ -1,4 +1,14 @@
-import { Typography, Button, TextField, Link } from "@mui/material";
+import {
+  Typography,
+  Button,
+  TextField,
+  Link,
+  InputAdornment,
+  IconButton,
+} from "@mui/material";
+import EmailIcon from "@mui/icons-material/Email";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useState, useEffect } from "react";
 import { useAuthContext } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -8,6 +18,7 @@ import "./Login.css";
 function Login() {
   const [email, setEmail] = useState<string>("");
   const [pass, setPass] = useState<string>("");
+  const [showPass, setShowPass] = useState<boolean>(false);
   const { user } = useAuthContext();
   const navigate = useNavigate();
 
@@ -20,6 +31,8 @@ function Login() {
 
     console.log(result);
   };
+
+  const handleShowPass = () => setShowPass((show) => !show);
 
   useEffect(() => {
     if (user) {
@@ -54,15 +67,39 @@ function Login() {
           onChange={(e) => setEmail(e.target.value)}
           fullWidth
           required
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <EmailIcon sx={{ color: "rgba(255,255,255,0.23)" }} />
+              </InputAdornment>
+            ),
+          }}
         ></TextField>
         <TextField
           id="pass"
           variant="outlined"
           label="Password"
-          type="password"
+          type={showPass ? "text" : "password"}
           onChange={(e) => setPass(e.target.value)}
           fullWidth
           required
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton
+                  aria-label="toggle password visibility"
+                  onClick={handleShowPass}
+                  edge="end"
+                  sx={{
+                    padding: "0 12px 0 0",
+                    color: "rgba(255,255,255,0.23)",
+                  }}
+                >
+                  {showPass ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
         ></TextField>
         <Typography
           variant="body2"

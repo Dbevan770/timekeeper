@@ -1,4 +1,15 @@
-import { TextField, Button, Typography, Link } from "@mui/material";
+import {
+  TextField,
+  Button,
+  Typography,
+  Link,
+  InputAdornment,
+  IconButton,
+} from "@mui/material";
+import PersonIcon from "@mui/icons-material/Person";
+import EmailIcon from "@mui/icons-material/Email";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useState, useEffect } from "react";
 import { SignUp } from "../../auth/signup";
 import { useAuthContext } from "../../context/AuthContext";
@@ -10,6 +21,8 @@ const Register = () => {
   const [email, setEmail] = useState<string>("");
   const [pass, setPass] = useState<string>("");
   const [confPass, setConfPass] = useState<string>("");
+  const [showPass, setShowPass] = useState<boolean>(false);
+  const [showConfirmPass, setShowConfirmPass] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
   const [errorText, setErrorText] = useState<string>("");
   const navigate = useNavigate();
@@ -34,6 +47,10 @@ const Register = () => {
     console.log(result);
     navigate("/login");
   };
+
+  const handleShowPassword = () => setShowPass((show) => !show);
+
+  const handleShowConfirmPassword = () => setShowConfirmPass((show) => !show);
 
   useEffect(() => {
     if (user) {
@@ -62,6 +79,13 @@ const Register = () => {
           onChange={(e) => setName(e.target.value)}
           fullWidth
           required
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <PersonIcon sx={{ color: "rgba(255,255,255,0.23)" }} />
+              </InputAdornment>
+            ),
+          }}
         ></TextField>
         <TextField
           id="email"
@@ -71,28 +95,69 @@ const Register = () => {
           onChange={(e) => setEmail(e.target.value)}
           fullWidth
           required
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <EmailIcon sx={{ color: "rgba(255,255,255,0.23)" }} />
+              </InputAdornment>
+            ),
+          }}
         ></TextField>
         <TextField
           error={error}
           id="pass"
           variant="outlined"
           label="Password"
-          type="password"
+          type={showPass ? "text" : "password"}
           onChange={(e) => setPass(e.target.value)}
           fullWidth
           helperText={errorText}
           required
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton
+                  aria-label="toggle password visibility"
+                  onClick={handleShowPassword}
+                  edge="end"
+                  sx={{
+                    padding: "0 12px 0 0",
+                    color: "rgba(255,255,255,0.23)",
+                  }}
+                >
+                  {showPass ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
         ></TextField>
         <TextField
           error={error}
           id="confirm-pass"
           variant="outlined"
           label="Confirm Password"
-          type="password"
+          type={showConfirmPass ? "text" : "password"}
           onChange={(e) => setConfPass(e.target.value)}
           fullWidth
           required
           sx={{ marginBottom: "2rem" }}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton
+                  aria-label="toggle password visibility"
+                  onClick={handleShowConfirmPassword}
+                  edge="end"
+                  sx={{
+                    padding: "0 12px 0 0",
+                    color: "rgba(255,255,255,0.23)",
+                  }}
+                >
+                  {showConfirmPass ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
         ></TextField>
         <Button form="register-form" variant="contained" type="submit">
           Create New Account
