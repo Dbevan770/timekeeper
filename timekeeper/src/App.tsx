@@ -1,5 +1,5 @@
 import "./App.css";
-import { Button } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 const App = () => {
@@ -11,9 +11,19 @@ const App = () => {
   return (
     <>
       <main className="main-page">
-        <h1 className="main-title">Timekeeper</h1>
-        <p className="main-subtitle">Never lose track of time again!</p>
-        <Button id="main-btn" variant="contained" onClick={handleClick}>
+        <Typography variant="h3">TIMEKEEPER</Typography>
+        <Typography
+          variant="subtitle1"
+          sx={{ marginBottom: "1rem", color: "rgba(255,255,255,0.5)" }}
+        >
+          Never lose track of time again!
+        </Typography>
+        <Button
+          id="main-btn"
+          variant="contained"
+          onClick={handleClick}
+          color="secondary"
+        >
           Get Started
         </Button>
       </main>

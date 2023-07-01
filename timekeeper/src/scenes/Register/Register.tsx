@@ -1,54 +1,56 @@
-import { TextField, Button } from "@mui/material";
+import { TextField, Button, Typography, Link } from "@mui/material";
 import { useState } from "react";
+import { SignUp } from "../../auth/signup";
+import { useNavigate } from "react-router-dom";
 import "./Register.css";
 
 const Register = () => {
-  const [user, setUser] = useState<string>("");
+  const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [pass, setPass] = useState<string>("");
   const [confPass, setConfPass] = useState<string>("");
   const [error, setError] = useState<boolean>(false);
   const [errorText, setErrorText] = useState<string>("");
+  const navigate = useNavigate();
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setError(false);
 
     if (pass !== confPass) {
       setError(true);
       setErrorText("Passwords do not match!");
+      return;
     }
 
-    console.log("I was submitted!");
+    const { result, error } = await SignUp(email, pass, name);
+
+    if (error) {
+      return console.error(error);
+    }
+
+    console.log(result);
+    navigate("/login");
   };
   return (
     <div className="register-form-container">
-      <h1 className="register-form-heading">Create an Account</h1>
-      <form onSubmit={handleSubmit} className="register-form">
+      <Typography
+        variant="h5"
+        sx={{ margin: "4rem auto 0 auto", maxWidth: "75%" }}
+      >
+        CREATE NEW ACCOUNT
+      </Typography>
+      <form
+        id="register-form"
+        onSubmit={handleSubmit}
+        className="register-form"
+      >
         <TextField
-          id="username"
+          id="name"
           variant="outlined"
-          label="Username"
-          onChange={(e) => setUser(e.target.value)}
-          sx={{
-            label: {
-              color: "#e1e1e1",
-            },
-            "label:focus": {
-              color: "#60ff51 !important",
-            },
-            input: {
-              color: "#e1e1e1",
-              border: "2px solid #e1e1e1",
-              borderRadius: ".25rem",
-            },
-            "fieldset:focus": {
-              borderColor: "#60ff51",
-              borderWidth: "2px",
-            },
-            "&.MuiOutlinedInput-notchedOutline": {
-              color: "red",
-            },
-          }}
+          label="Display Name"
+          type="text"
+          onChange={(e) => setName(e.target.value)}
           fullWidth
           required
         ></TextField>
@@ -81,11 +83,32 @@ const Register = () => {
           onChange={(e) => setConfPass(e.target.value)}
           fullWidth
           required
+          sx={{ marginBottom: "2rem" }}
         ></TextField>
-        <Button variant="contained" type="submit">
-          Sign Up
+        <Button form="register-form" variant="contained" type="submit">
+          Create New Account
         </Button>
+        <Typography
+          variant="body1"
+          sx={{
+            fontSize: ".75rem",
+            padding: "0 1rem",
+            textWrap: "balance",
+            color: "rgba(255,255,255,0.5)",
+          }}
+        >
+          By tapping "Create New Account" you agree to the{" "}
+          <Link href="#" target="_blank" underline="none" color="secondary">
+            terms & conditions
+          </Link>
+        </Typography>
       </form>
+      <div className="login-form-footer">
+        <Typography variant="body2">Already have an account?</Typography>
+        <Link href="/login" underline="none" color="secondary">
+          Sign In
+        </Link>
+      </div>
     </div>
   );
 };

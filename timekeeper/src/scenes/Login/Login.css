@@ -1,16 +1,12 @@
-.register-form-container {
+.login-form-container {
   width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
 
-.register-form {
+.login-form {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-}
-
-.first-last {
-  display: flex;
 }
