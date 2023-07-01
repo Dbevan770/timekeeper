@@ -13,13 +13,7 @@ const App = () => {
       <main className="main-page">
         <h1 className="main-title">Timekeeper</h1>
         <p className="main-subtitle">Never lose track of time again!</p>
-        <Button
-          variant="contained"
-          onClick={handleClick}
-          style={{
-            backgroundColor: "#68fd79",
-          }}
-        >
+        <Button id="main-btn" variant="contained" onClick={handleClick}>
           Get Started
         </Button>
       </main>

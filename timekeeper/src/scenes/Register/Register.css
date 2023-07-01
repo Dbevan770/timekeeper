@@ -1,0 +1,9 @@
+.register-form-container {
+  width: 100%;
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
