@@ -1,11 +1,15 @@
 import { Typography, Button, TextField, Link } from "@mui/material";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAuthContext } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 import { SignIn } from "../../auth/signin";
 import "./Login.css";
 
 function Login() {
   const [email, setEmail] = useState<string>("");
   const [pass, setPass] = useState<string>("");
+  const { user } = useAuthContext();
+  const navigate = useNavigate();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -16,6 +20,13 @@ function Login() {
 
     console.log(result);
   };
+
+  useEffect(() => {
+    if (user) {
+      navigate("/dashboard");
+    }
+  }, [user]);
+
   return (
     <div className="login-form-container">
       <Typography

@@ -1,6 +1,7 @@
 import { TextField, Button, Typography, Link } from "@mui/material";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SignUp } from "../../auth/signup";
+import { useAuthContext } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import "./Register.css";
 
@@ -12,6 +13,7 @@ const Register = () => {
   const [error, setError] = useState<boolean>(false);
   const [errorText, setErrorText] = useState<string>("");
   const navigate = useNavigate();
+  const { user } = useAuthContext();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -32,6 +34,13 @@ const Register = () => {
     console.log(result);
     navigate("/login");
   };
+
+  useEffect(() => {
+    if (user) {
+      navigate("/dashboard");
+    }
+  }, [user]);
+
   return (
     <div className="register-form-container">
       <Typography
