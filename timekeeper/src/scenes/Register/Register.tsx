@@ -121,7 +121,7 @@ const Register = () => {
                   onClick={handleShowPassword}
                   edge="end"
                   sx={{
-                    padding: "0 12px 0 0",
+                    padding: "0 .75rem 0 0",
                     color: "rgba(255,255,255,0.23)",
                   }}
                 >
@@ -140,7 +140,7 @@ const Register = () => {
           onChange={(e) => setConfPass(e.target.value)}
           fullWidth
           required
-          sx={{ marginBottom: "2rem" }}
+          sx={{ marginBottom: "1.5rem" }}
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
@@ -149,7 +149,7 @@ const Register = () => {
                   onClick={handleShowConfirmPassword}
                   edge="end"
                   sx={{
-                    padding: "0 12px 0 0",
+                    padding: "0 .75rem 0 0",
                     color: "rgba(255,255,255,0.23)",
                   }}
                 >
@@ -159,7 +159,12 @@ const Register = () => {
             ),
           }}
         ></TextField>
-        <Button form="register-form" variant="contained" type="submit">
+        <Button
+          form="register-form"
+          variant="contained"
+          type="submit"
+          sx={{ marginBottom: ".5rem" }}
+        >
           Create New Account
         </Button>
         <Typography

@@ -25,7 +25,6 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
         setUser(null);
       }
       setLoading(false);
-      console.log(user);
     });
 
     return () => unsubscribe();

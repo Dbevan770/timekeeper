@@ -91,7 +91,7 @@ function Login() {
                   onClick={handleShowPass}
                   edge="end"
                   sx={{
-                    padding: "0 12px 0 0",
+                    padding: "0 .75rem 0 0",
                     color: "rgba(255,255,255,0.23)",
                   }}
                 >

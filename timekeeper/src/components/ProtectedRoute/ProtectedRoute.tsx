@@ -5,8 +5,6 @@ const ProtectedRoute = () => {
   const { user } = useAuthContext();
   const location = useLocation();
 
-  console.log("Value of user:", user);
-
   return user !== null ? (
     <Outlet />
   ) : (
