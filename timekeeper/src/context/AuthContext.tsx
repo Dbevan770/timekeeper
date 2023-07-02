@@ -2,7 +2,13 @@ import { FIREBASE_AUTH } from "../firebaseConfig";
 import { onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
 import { createContext, useContext, useState, useEffect } from "react";
 
-export const AuthContext = createContext({});
+interface AuthContextType {
+  user: FirebaseUser | null;
+}
+
+export const AuthContext = createContext<AuthContextType>({
+  user: null,
+});
 
 export const useAuthContext = () => useContext(AuthContext);
 

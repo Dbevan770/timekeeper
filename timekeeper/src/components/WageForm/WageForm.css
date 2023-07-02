@@ -1,0 +1,17 @@
+#add-wages-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.currency-rate {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.time-container {
+  display: flex;
+  gap: 0.25rem;
+  align-items: center;
+  justify-content: center;
+}

@@ -1,4 +1,4 @@
-import { FIREBASE_AUTH } from "../src/firebaseConfig";
+import { FIREBASE_AUTH } from "../firebaseConfig";
 import { signInWithEmailAndPassword } from "firebase/auth";
 
 export const SignIn = async (email: string, password: string) => {
