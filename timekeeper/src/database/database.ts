@@ -15,8 +15,6 @@ export const CreateWage = async (
 ) => {
   if (user === null) return;
 
-  console.log(shiftDate);
-
   const docRef = await addDoc(collection(FIREBASE_DB, user.uid), {
     shiftDate: shiftDate,
     startTime: startTime,
