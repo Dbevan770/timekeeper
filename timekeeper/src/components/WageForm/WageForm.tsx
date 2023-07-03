@@ -13,6 +13,7 @@ import { Dayjs } from "dayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { useState } from "react";
 import "./WageForm.css";
+import BreakInput from "../BreakInput/BreakInput";
 
 interface WageFormProps {
   onSubmit: (
@@ -26,7 +27,7 @@ interface WageFormProps {
     endMin: string,
     endMeridian: string,
     totalEarned: string,
-    breaks: string[]
+    breaks: { value: string; unit: string }[]
   ) => void;
 }
 
@@ -44,7 +45,9 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
   const [endMin, setEndMin] = useState<string>("");
   const [endMinError, setEndMinError] = useState<string>("");
   const [endMeridian, setEndMeridian] = useState<string>("AM");
-  const [breaks, setBreaks] = useState<string[]>([]);
+  const [breaks, setBreaks] = useState<Array<{ value: string; unit: string }>>(
+    []
+  );
 
   const currencies = [
     {
@@ -87,31 +90,30 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
     } else if (parseInt(value) < 0 || parseInt(value) > upperLimit) {
       setError(`Value must be between 0 and ${upperLimit}`);
     } else {
-      setTime(parseInt(value).toString());
+      setTime(value);
     }
   };
 
-  const handleBreakChange = (increment: number) => {
-    if (increment < 0 && breaks.length === 0) return;
-
-    setBreaks((prev) => {
-      if (increment > 0) {
-        return [...prev, ""];
-      } else {
-        return prev.slice(0, -1);
-      }
+  const handleBreakChange = (
+    index: number,
+    breakValue: { value: string; unit: string }
+  ) => {
+    setBreaks((prevBreaks) => {
+      const newBreaks = [...prevBreaks];
+      newBreaks[index] = breakValue;
+      return newBreaks;
     });
   };
 
-  const handleBreakInputChange = (value: string, index: number) => {
-    if (!/^\d*$/.test(value)) {
-      return;
-    }
+  const handleAddOrRemoveBreak = (increment: number) => {
+    if (increment < 0 && breaks.length === 0) return;
 
-    setBreaks((prev) => {
-      const newBreaks = [...prev];
-      newBreaks[index] = value;
-      return newBreaks;
+    setBreaks((prevBreaks) => {
+      if (increment > 0) {
+        return [...prevBreaks, { value: "", unit: "H" }];
+      } else {
+        return prevBreaks.slice(0, -1);
+      }
     });
   };
 
@@ -147,8 +149,12 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
     // Convert the difference to hours
     const diffHours = diffMinutes / 60;
 
-    const totalBreaks =
-      breaks.reduce((acc, curr) => acc + parseInt(curr), 0) / 60;
+    const totalBreaks = breaks.reduce((total, breakObj) => {
+      const breakValue = parseInt(breakObj.value);
+      const breakUnit = breakObj.unit;
+      const breakInHours = breakUnit === "H" ? breakValue : breakValue / 60;
+      return total + breakInHours;
+    }, 0);
 
     const earned = ((diffHours - totalBreaks) * parseFloat(rate)).toFixed(2);
 
@@ -319,37 +325,22 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
       </div>
       <div className="add-remove-breaks-container">
         <div className="add-remove-btns">
-          <Button variant="outlined" onClick={() => handleBreakChange(-1)}>
+          <Button variant="outlined" onClick={() => handleAddOrRemoveBreak(-1)}>
             <RemoveIcon />
           </Button>
-          <Button variant="outlined" onClick={() => handleBreakChange(1)}>
+          <Button variant="outlined" onClick={() => handleAddOrRemoveBreak(1)}>
             <AddIcon />
           </Button>
         </div>
         <Typography variant="h6">Breaks: {breaks.length}</Typography>
       </div>
       {breaks.map((breakValue, index) => (
-        <TextField
-          variant="outlined"
+        <BreakInput
+          breakValue={breakValue}
+          onChange={handleBreakChange}
+          index={index}
           key={index}
-          label={`Break ${index + 1}`}
-          value={breakValue}
-          onChange={(e) => handleBreakInputChange(e.target.value, index)}
-          fullWidth
-          required
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <Typography
-                  variant="body2"
-                  sx={{ color: "rgba(255,255,255,0.23)" }}
-                >
-                  minutes
-                </Typography>
-              </InputAdornment>
-            ),
-          }}
-        ></TextField>
+        />
       ))}
       <Button variant="contained" type="submit" sx={{ marginTop: "1rem" }}>
         Calculate

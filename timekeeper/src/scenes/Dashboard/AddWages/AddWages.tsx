@@ -1,8 +1,9 @@
 import WageForm from "../../../components/WageForm/WageForm";
 import { useState } from "react";
-import { Typography, Link, Button } from "@mui/material";
+import { Typography, Link, Button, CircularProgress } from "@mui/material";
 import { CreateWage } from "../../../database/database";
 import { useAuthContext } from "../../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 import "./AddWages.css";
 
 const AddWages = () => {
@@ -17,8 +18,12 @@ const AddWages = () => {
   const [endHour, setEndHour] = useState<string>("");
   const [endMin, setEndMin] = useState<string>("");
   const [endMeridian, setEndMeridian] = useState<string>("");
-  const [breaks, setBreaks] = useState<string[]>([]);
+  const [breaks, setBreaks] = useState<Array<{ value: string; unit: string }>>(
+    []
+  );
+  const [loading, setLoading] = useState<boolean>(false);
   const { user } = useAuthContext();
+  const navigate = useNavigate();
 
   const handleSetSubmit = (
     shiftDate: Date | null,
@@ -31,7 +36,7 @@ const AddWages = () => {
     endMin: string,
     endMeridian: string,
     totalEarned: string,
-    breaks: string[]
+    breaks: { value: string; unit: string }[]
   ) => {
     setSubmitted(true);
     setShiftDate(shiftDate);
@@ -63,13 +68,18 @@ const AddWages = () => {
   };
 
   const handleSave = async () => {
+    setLoading(true);
     const startTime = `${startHour}:${startMin}${startMeridian}`;
     const endTime = `${endHour}:${endMin}${endMeridian}`;
     const totalBreaks = breaks.length;
-    const totalBreakTime = breaks.reduce(
-      (acc, curr) => acc + parseInt(curr),
-      0
-    );
+    const totalBreakTime = breaks.reduce((acc, curr) => {
+      // If the unit of the current break time is in hours, convert it to minutes
+      if (curr.unit === "H") {
+        return acc + parseInt(curr.value) * 60;
+      }
+      // If it's not in hours, we'll assume it's in minutes and add it directly
+      return acc + parseInt(curr.value);
+    }, 0);
     const result = await CreateWage(
       user,
       shiftDate,
@@ -83,38 +93,52 @@ const AddWages = () => {
     );
 
     console.log(result);
+    navigate("/dashboard/add-wages/success");
   };
   return (
-    <div className="add-wages-container">
-      {!submitted ? (
-        <WageForm onSubmit={handleSetSubmit} />
+    <>
+      {!loading ? (
+        <div className="add-wages-container">
+          {!submitted ? (
+            <WageForm onSubmit={handleSetSubmit} />
+          ) : (
+            <div className="earned-wages-container">
+              <Typography
+                variant="h6"
+                sx={{ fontWeight: "300", color: "rgba(255,255,255,0.48)" }}
+              >
+                Congrats, you earned
+              </Typography>
+              <Typography variant="h1">
+                {currency === "EUR" ? "€" + totalEarned : "$" + totalEarned}
+              </Typography>
+              <Typography variant="body1" sx={{ marginBottom: "1.5rem" }}>
+                Not right?{" "}
+                <Link
+                  onClick={handleResetForm}
+                  underline="none"
+                  color="secondary"
+                >
+                  Try again
+                </Link>
+              </Typography>
+              <Button
+                variant="contained"
+                sx={{ width: "100%", fontSize: "1rem" }}
+                onClick={handleSave}
+              >
+                Save
+              </Button>
+            </div>
+          )}
+        </div>
       ) : (
-        <div className="earned-wages-container">
-          <Typography
-            variant="h6"
-            sx={{ fontWeight: "300", color: "rgba(255,255,255,0.48)" }}
-          >
-            Congrats, you earned
-          </Typography>
-          <Typography variant="h1">
-            {currency === "EUR" ? "€" + totalEarned : "$" + totalEarned}
-          </Typography>
-          <Typography variant="body1" sx={{ marginBottom: "1.5rem" }}>
-            Not right?{" "}
-            <Link onClick={handleResetForm} underline="none" color="secondary">
-              Try again
-            </Link>
-          </Typography>
-          <Button
-            variant="contained"
-            sx={{ width: "100%", fontSize: "1rem" }}
-            onClick={handleSave}
-          >
-            Save
-          </Button>
+        <div className="loading-container">
+          <Typography variant="h4">Saving...</Typography>
+          <CircularProgress color="primary" />
         </div>
       )}
-    </div>
+    </>
   );
 };
 
