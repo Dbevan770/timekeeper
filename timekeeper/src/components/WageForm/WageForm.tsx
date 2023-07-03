@@ -9,12 +9,14 @@ import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { Dayjs } from "dayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { useState } from "react";
 import "./WageForm.css";
 
 interface WageFormProps {
   onSubmit: (
+    shiftDate: Date | null,
     rate: string,
     currency: string,
     startHour: string,
@@ -30,6 +32,7 @@ interface WageFormProps {
 
 const WageForm = ({ onSubmit }: WageFormProps) => {
   const [rate, setRate] = useState<string>("");
+  const [shiftDate, setShiftDate] = useState<Date | null>(null);
   const [currency, setCurrency] = useState<string>("EUR");
   const [startHour, setStartHour] = useState<string>("");
   const [startHourError, setStartHourError] = useState<string>("");
@@ -157,6 +160,7 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
     console.log(`Congrats! You earned €${earned} today!`);
 
     onSubmit(
+      shiftDate,
       rate,
       currency,
       startHour,
@@ -212,7 +216,12 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
         ></TextField>
       </div>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <DatePicker label="Date of Shift" />
+        <DatePicker
+          label="Date of Shift"
+          onChange={(date: Dayjs | null) =>
+            setShiftDate(date?.toDate() ?? null)
+          }
+        />
       </LocalizationProvider>
       <Typography variant="subtitle1" sx={{ fontSize: ".75rem" }}>
         Start Time
