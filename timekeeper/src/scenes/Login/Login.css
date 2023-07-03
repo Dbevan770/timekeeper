@@ -5,6 +5,13 @@
   justify-content: space-between;
 }
 
+.loading-circle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
 .login-form {
   display: flex;
   flex-direction: column;

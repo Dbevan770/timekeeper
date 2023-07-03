@@ -1,72 +1,58 @@
-import { TextField, MenuItem } from "@mui/material";
+import { TextField } from "@mui/material";
 import { useState } from "react";
 import "./BreakInput.css";
 
 interface BreakInputProps {
   index: number;
-  breakValue: { value: string; unit: string };
+  breakValue: { hours: string; minutes: string };
   onChange: (
     index: number,
-    breakValue: { value: string; unit: string }
+    breakValue: { hours: string; minutes: string }
   ) => void;
 }
 
 const BreakInput = ({ index, breakValue, onChange }: BreakInputProps) => {
-  const [currentBreakValue, setCurrentBreakValue] = useState<string>(
-    breakValue.value
+  const [currentBreakHours, setCurrentBreakHours] = useState<string>(
+    breakValue.hours || ""
   );
-  const [breakUnit, setBreakUnit] = useState<string>(breakValue.unit);
+  const [currentBreakMinutes, setCurrentBreakMinutes] = useState<string>(
+    breakValue.minutes || ""
+  );
 
-  const breakUnits = [
-    {
-      value: "H",
-      label: "hours",
-    },
-    {
-      value: "M",
-      label: "minutes",
-    },
-  ];
+  const handleBreakHoursChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!/^\d*$/.test(e.target.value)) return;
 
-  const handleBreakValueChange = (e: any) => {
-    if (!/^\d*$/.test(e.target.value)) {
-      return;
-    }
-
-    setCurrentBreakValue(e.target.value);
-    onChange(index, { value: e.target.value, unit: breakUnit });
+    setCurrentBreakHours(e.target.value);
+    onChange(index, { hours: e.target.value, minutes: currentBreakMinutes });
   };
 
-  const handleBreakUnitChange = (e: any) => {
-    setBreakUnit(e.target.value);
-    onChange(index, { value: currentBreakValue, unit: e.target.value });
+  const handleBreakMinutesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!/^\d*$/.test(e.target.value)) return;
+
+    setCurrentBreakMinutes(e.target.value);
+    onChange(index, { hours: currentBreakHours, minutes: e.target.value });
   };
 
   return (
     <div className="break-container">
       <TextField
         variant="outlined"
-        key={index}
-        label={`Break ${index + 1}`}
-        value={breakValue.value}
-        onChange={handleBreakValueChange} // Here
+        key={`${index}-hours`}
+        label={`Hours`}
+        value={breakValue.hours}
+        onChange={handleBreakHoursChange} // Here
         fullWidth
         required
       ></TextField>
       <TextField
-        select
         variant="outlined"
-        label="Unit"
-        value={breakValue.unit}
-        onChange={handleBreakUnitChange} // Here
-        sx={{ minWidth: "8rem" }}
-      >
-        {breakUnits.map((option) => (
-          <MenuItem key={option.value} value={option.value}>
-            {option.label}
-          </MenuItem>
-        ))}
-      </TextField>
+        key={`${index}-minutes`}
+        label={`Minutes`}
+        value={breakValue.minutes}
+        onChange={handleBreakMinutesChange} // Here
+        fullWidth
+        required
+      ></TextField>
     </div>
   );
 };
