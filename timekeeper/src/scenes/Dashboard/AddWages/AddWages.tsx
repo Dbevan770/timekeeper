@@ -1,10 +1,11 @@
 import WageForm from "../../../components/WageForm/WageForm";
 import { useState } from "react";
-import { Typography, Link, Button, CircularProgress } from "@mui/material";
+import { Typography, Link, Button } from "@mui/material";
 import { CreateWage } from "../../../database/database";
 import { useAuthContext } from "../../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import "./AddWages.css";
+import Loading from "../../../components/Loading/Loading";
 
 const AddWages = () => {
   const [submitted, setSubmitted] = useState<boolean>(false);
@@ -18,9 +19,9 @@ const AddWages = () => {
   const [endHour, setEndHour] = useState<string>("");
   const [endMin, setEndMin] = useState<string>("");
   const [endMeridian, setEndMeridian] = useState<string>("");
-  const [breaks, setBreaks] = useState<Array<{ value: string; unit: string }>>(
-    []
-  );
+  const [breaks, setBreaks] = useState<
+    Array<{ hours: string; minutes: string }>
+  >([]);
   const [loading, setLoading] = useState<boolean>(false);
   const { user } = useAuthContext();
   const navigate = useNavigate();
@@ -36,7 +37,7 @@ const AddWages = () => {
     endMin: string,
     endMeridian: string,
     totalEarned: string,
-    breaks: { value: string; unit: string }[]
+    breaks: { hours: string; minutes: string }[]
   ) => {
     setSubmitted(true);
     setShiftDate(shiftDate);
@@ -73,12 +74,10 @@ const AddWages = () => {
     const endTime = `${endHour}:${endMin}${endMeridian}`;
     const totalBreaks = breaks.length;
     const totalBreakTime = breaks.reduce((acc, curr) => {
-      // If the unit of the current break time is in hours, convert it to minutes
-      if (curr.unit === "H") {
-        return acc + parseInt(curr.value) * 60;
-      }
-      // If it's not in hours, we'll assume it's in minutes and add it directly
-      return acc + parseInt(curr.value);
+      const breakHours = parseInt(curr.hours) || 0;
+      const breakMinutes = parseInt(curr.minutes) || 0;
+      // Convert breakHours to minutes and add it to breakMinutes
+      return acc + breakHours * 60 + breakMinutes;
     }, 0);
     const result = await CreateWage(
       user,
@@ -133,10 +132,7 @@ const AddWages = () => {
           )}
         </div>
       ) : (
-        <div className="loading-container">
-          <Typography variant="h4">Saving...</Typography>
-          <CircularProgress color="primary" />
-        </div>
+        <Loading label="Saving..." />
       )}
     </>
   );

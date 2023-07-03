@@ -3,6 +3,7 @@ import { Button, Typography } from "@mui/material";
 import { useAuthContext } from "./context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import Loading from "./components/Loading/Loading";
 
 const App = () => {
   const navigate = useNavigate();
@@ -37,7 +38,7 @@ const App = () => {
           </Button>
         </main>
       ) : (
-        <div>Loading...</div>
+        <Loading label="Loading..." />
       )}
     </>
   );

@@ -14,6 +14,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { useState } from "react";
 import "./WageForm.css";
 import BreakInput from "../BreakInput/BreakInput";
+import TimeInput from "../TimeInput/TimeInput";
 
 interface WageFormProps {
   onSubmit: (
@@ -27,7 +28,7 @@ interface WageFormProps {
     endMin: string,
     endMeridian: string,
     totalEarned: string,
-    breaks: { value: string; unit: string }[]
+    breaks: { hours: string; minutes: string }[]
   ) => void;
 }
 
@@ -36,18 +37,14 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
   const [shiftDate, setShiftDate] = useState<Date | null>(null);
   const [currency, setCurrency] = useState<string>("EUR");
   const [startHour, setStartHour] = useState<string>("");
-  const [startHourError, setStartHourError] = useState<string>("");
   const [startMin, setStartMin] = useState<string>("");
-  const [startMinError, setStartMinError] = useState<string>("");
   const [startMeridian, setStartMeridian] = useState<string>("AM");
   const [endHour, setEndHour] = useState<string>("");
-  const [endHourError, setEndHourError] = useState<string>("");
   const [endMin, setEndMin] = useState<string>("");
-  const [endMinError, setEndMinError] = useState<string>("");
   const [endMeridian, setEndMeridian] = useState<string>("AM");
-  const [breaks, setBreaks] = useState<Array<{ value: string; unit: string }>>(
-    []
-  );
+  const [breaks, setBreaks] = useState<
+    Array<{ hours: string; minutes: string }>
+  >([]);
 
   const currencies = [
     {
@@ -61,42 +58,10 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
       symbol: "€",
     },
   ];
-  const meridian = [
-    {
-      value: "AM",
-      label: "AM",
-    },
-    {
-      value: "PM",
-      label: "PM",
-    },
-  ];
-
-  const handleTimeChange = (
-    value: string,
-    setTime: React.Dispatch<React.SetStateAction<string>>,
-    setError: React.Dispatch<React.SetStateAction<string>>,
-    upperLimit: number
-  ) => {
-    setError("");
-
-    if (value === "") {
-      setTime("");
-      return;
-    }
-
-    if (!/^\d+$/.test(value)) {
-      setError("Value must be a number");
-    } else if (parseInt(value) < 0 || parseInt(value) > upperLimit) {
-      setError(`Value must be between 0 and ${upperLimit}`);
-    } else {
-      setTime(value);
-    }
-  };
 
   const handleBreakChange = (
     index: number,
-    breakValue: { value: string; unit: string }
+    breakValue: { hours: string; minutes: string }
   ) => {
     setBreaks((prevBreaks) => {
       const newBreaks = [...prevBreaks];
@@ -110,7 +75,7 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
 
     setBreaks((prevBreaks) => {
       if (increment > 0) {
-        return [...prevBreaks, { value: "", unit: "H" }];
+        return [...prevBreaks, { hours: "", minutes: "" }];
       } else {
         return prevBreaks.slice(0, -1);
       }
@@ -150,9 +115,9 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
     const diffHours = diffMinutes / 60;
 
     const totalBreaks = breaks.reduce((total, breakObj) => {
-      const breakValue = parseInt(breakObj.value);
-      const breakUnit = breakObj.unit;
-      const breakInHours = breakUnit === "H" ? breakValue : breakValue / 60;
+      const breakHours = parseInt(breakObj.hours) || 0;
+      const breakMinutes = parseInt(breakObj.minutes) || 0;
+      const breakInHours = breakHours + breakMinutes / 60;
       return total + breakInHours;
     }, 0);
 
@@ -222,107 +187,24 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
           }
         />
       </LocalizationProvider>
-      <Typography variant="subtitle1" sx={{ fontSize: ".75rem" }}>
-        Start Time
-      </Typography>
-      <div className="time-container">
-        <TextField
-          value={startHour}
-          onChange={(e) =>
-            handleTimeChange(
-              e.target.value,
-              setStartHour,
-              setStartHourError,
-              12
-            )
-          }
-          error={Boolean(startHourError)}
-          helperText={startHourError}
-          variant="outlined"
-          label="HH"
-          id="start-time-hour"
-          required
-          sx={{ maxWidth: "8rem" }}
-        ></TextField>
-        <Typography variant="h4">:</Typography>
-        <TextField
-          value={startMin}
-          onChange={(e) =>
-            handleTimeChange(e.target.value, setStartMin, setStartMinError, 59)
-          }
-          error={Boolean(startMinError)}
-          helperText={startMinError}
-          variant="outlined"
-          label="MM"
-          id="start-time-min"
-          required
-          sx={{ maxWidth: "8rem" }}
-        ></TextField>
-        <TextField
-          value={startMeridian}
-          onChange={(e) => setStartMeridian(e.target.value)}
-          variant="outlined"
-          id="start-time-meridian"
-          defaultValue="AM"
-          required
-          fullWidth
-          select
-        >
-          {meridian.map((option) => (
-            <MenuItem key={option.value} value={option.value}>
-              {option.label}
-            </MenuItem>
-          ))}
-        </TextField>
-      </div>
-      <Typography variant="subtitle1" sx={{ fontSize: ".75rem" }}>
-        End Time
-      </Typography>
-      <div className="time-container">
-        <TextField
-          value={endHour}
-          onChange={(e) =>
-            handleTimeChange(e.target.value, setEndHour, setEndHourError, 12)
-          }
-          error={Boolean(endHourError)}
-          helperText={endHourError}
-          variant="outlined"
-          label="HH"
-          id="end-time-hour"
-          required
-          sx={{ maxWidth: "8rem" }}
-        ></TextField>
-        <Typography variant="h4">:</Typography>
-        <TextField
-          value={endMin}
-          onChange={(e) =>
-            handleTimeChange(e.target.value, setEndMin, setEndMinError, 59)
-          }
-          error={Boolean(endMinError)}
-          helperText={endMinError}
-          variant="outlined"
-          label="MM"
-          id="end-time-min"
-          required
-          sx={{ maxWidth: "8rem" }}
-        ></TextField>
-        <TextField
-          value={endMeridian}
-          onChange={(e) => setEndMeridian(e.target.value)}
-          variant="outlined"
-          id="end-time-meridian"
-          defaultValue="AM"
-          required
-          fullWidth
-          select
-        >
-          {meridian.map((option) => (
-            <MenuItem key={option.value} value={option.value}>
-              {option.label}
-            </MenuItem>
-          ))}
-        </TextField>
-      </div>
+      <TimeInput
+        label="Start Time"
+        hour={startHour}
+        setHour={setStartHour}
+        min={startMin}
+        setMin={setStartMin}
+        meridian={startMeridian}
+        setMeridian={setStartMeridian}
+      />
+      <TimeInput
+        label="End Time"
+        hour={endHour}
+        setHour={setEndHour}
+        min={endMin}
+        setMin={setEndMin}
+        meridian={endMeridian}
+        setMeridian={setEndMeridian}
+      />
       <div className="add-remove-breaks-container">
         <div className="add-remove-btns">
           <Button variant="outlined" onClick={() => handleAddOrRemoveBreak(-1)}>
