@@ -132,9 +132,6 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
     if (startMeridian === "AM" && startHour === "12") startHour24 = 0;
     if (endMeridian === "PM" && endHour === "12") endHour24 = 0;
 
-    console.log(`Start Time in 24H format: ${startHour24}:${startMin}`);
-    console.log(`End time in 24H format: ${endHour24}:${endMin}`);
-
     // Convert the hours and minutes to minutes
     const startMinutes = startHour24 * 60 + parseInt(startMin);
     const endMinutes = endHour24 * 60 + parseInt(endMin);
@@ -150,14 +147,10 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
     // Convert the difference to hours
     const diffHours = diffMinutes / 60;
 
-    console.log(`The difference is ${diffHours} hours`);
-
     const totalBreaks =
       breaks.reduce((acc, curr) => acc + parseInt(curr), 0) / 60;
 
     const earned = ((diffHours - totalBreaks) * parseFloat(rate)).toFixed(2);
-
-    console.log(`Congrats! You earned €${earned} today!`);
 
     onSubmit(
       shiftDate,

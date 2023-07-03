@@ -21,6 +21,8 @@ export const SignUp = async (
       displayName: displayName,
     });
 
+    console.log(update);
+
     result = {
       msg: "Successfully created new user!",
       displayName: displayName,
