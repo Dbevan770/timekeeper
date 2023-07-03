@@ -15,3 +15,9 @@
   align-items: center;
   justify-content: center;
 }
+
+.add-remove-breaks-container {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: space-between;
+}

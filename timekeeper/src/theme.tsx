@@ -41,6 +41,9 @@ const theme = createTheme({
         root: {
           "& .MuiInputLabel-root": {
             color: "rgba(255,255,255,0.23)",
+            "&.Mui-focused": {
+              color: "#5fff51",
+            },
           },
           "& .MuiOutlinedInput-root": {
             fieldset: {
@@ -69,6 +72,16 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           fontSize: "1rem",
+        },
+        outlined: {
+          color: "#e1e1e1",
+          borderWidth: "2px",
+          borderColor: "rgba(255,255,255,0.23)",
+          padding: ".25rem",
+          "&:hover": {
+            borderWidth: "2px",
+            borderColor: "rgba(255,255,255,0.23)",
+          },
         },
       },
     },
@@ -110,17 +123,6 @@ const theme = createTheme({
         root: {
           backgroundColor: "#242424",
           color: "#e1e1e1",
-        },
-      },
-    },
-    MuiInputBase: {
-      styleOverrides: {
-        root: {
-          "&.custom-input": {
-            "&:placeholder": {
-              color: "red",
-            },
-          },
         },
       },
     },
