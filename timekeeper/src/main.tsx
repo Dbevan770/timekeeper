@@ -12,6 +12,7 @@ import Dashboard from "./scenes/Dashboard/Dashboard.tsx";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute.tsx";
 import theme from "./theme.tsx";
 import AddWages from "./scenes/Dashboard/AddWages/AddWages.tsx";
+import Success from "./scenes/Dashboard/AddWages/Success/Success.tsx";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
@@ -26,6 +27,10 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
             <Route element={<ProtectedRoute />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/dashboard/add-wages" element={<AddWages />} />
+              <Route
+                path="/dashboard/add-wages/success"
+                element={<Success />}
+              />
             </Route>
             <Route path="*" element={<ErrorPage />} />
           </Routes>
