@@ -6,6 +6,7 @@ import {
   InputAdornment,
   IconButton,
   CircularProgress,
+  Backdrop,
 } from "@mui/material";
 import EmailIcon from "@mui/icons-material/Email";
 import Visibility from "@mui/icons-material/Visibility";
@@ -61,11 +62,9 @@ function Login() {
             TIMEKEEPER
           </Typography>
           <form id="login-form" onSubmit={handleSubmit} className="login-form">
-            {loading && (
-              <div className="loading-circle">
-                <CircularProgress color="primary" size={40} />
-              </div>
-            )}
+            <Backdrop open={loading} sx={{ color: "#fff", zIndex: 1 }}>
+              <CircularProgress color="primary" />
+            </Backdrop>
             <Typography
               variant="h5"
               sx={{

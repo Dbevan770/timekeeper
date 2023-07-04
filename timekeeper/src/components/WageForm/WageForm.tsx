@@ -18,6 +18,7 @@ import TimeInput from "../TimeInput/TimeInput";
 
 interface WageFormProps {
   onSubmit: (
+    totalHours: number,
     shiftDate: Date | null,
     rate: string,
     currency: string,
@@ -124,6 +125,7 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
     const earned = ((diffHours - totalBreaks) * parseFloat(rate)).toFixed(2);
 
     onSubmit(
+      diffHours,
       shiftDate,
       rate,
       currency,

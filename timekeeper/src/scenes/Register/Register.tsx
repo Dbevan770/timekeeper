@@ -6,6 +6,7 @@ import {
   InputAdornment,
   IconButton,
   CircularProgress,
+  Backdrop,
 } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
 import EmailIcon from "@mui/icons-material/Email";
@@ -82,11 +83,9 @@ const Register = () => {
             onSubmit={handleSubmit}
             className="register-form"
           >
-            {loading && (
-              <div className="loading-circle">
-                <CircularProgress color="primary" size={40} />
-              </div>
-            )}
+            <Backdrop open={loading} sx={{ color: "#fff", zIndex: 1 }}>
+              <CircularProgress color="primary" />
+            </Backdrop>
             <TextField
               id="name"
               variant="outlined"
