@@ -86,7 +86,9 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (startHour === null) return;
+    if (startHour === null || startHour === "0") return;
+    if (endHour === null || endHour === "0") return;
+    if (shiftDate === null) return;
 
     let startHour24 =
       startMeridian === "PM" && parseInt(startHour) < 12

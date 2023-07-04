@@ -57,6 +57,15 @@ const Dashboard = () => {
     <>
       {!loading ? (
         <div className="dashboard-container">
+          {wages.length > 0 && (
+            <Fab
+              color="primary"
+              sx={{ position: "absolute", bottom: "4.5rem", right: "2rem" }}
+              onClick={handleClick}
+            >
+              <Add />
+            </Fab>
+          )}
           <div className="dashboard-header">
             <Typography variant="h3">
               Hello {user && user.displayName}!
@@ -64,20 +73,11 @@ const Dashboard = () => {
           </div>
           <div className="dashboard-content">
             {wages.length > 0 ? (
-              <>
-                <div className="shift-items-container">
-                  {wages.map((wage: WageObjectProps, index: number) => (
-                    <ShiftItem wage={wage} key={index} />
-                  ))}
-                </div>
-                <Fab
-                  color="primary"
-                  sx={{ position: "absolute", bottom: "4.5rem", right: "2rem" }}
-                  onClick={handleClick}
-                >
-                  <Add />
-                </Fab>
-              </>
+              <div className="shift-items-container">
+                {wages.map((wage: WageObjectProps, index: number) => (
+                  <ShiftItem wage={wage} key={index} />
+                ))}
+              </div>
             ) : (
               <>
                 <Typography
