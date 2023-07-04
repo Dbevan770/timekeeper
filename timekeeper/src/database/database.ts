@@ -5,6 +5,7 @@ import { convertTimestamp } from "../utils/convertTimestamp";
 
 export const CreateWage = async (
   user: FirebaseUser | null,
+  totalHours: number,
   shiftDate: Date | null,
   startTime: string,
   endTime: string,
@@ -17,6 +18,7 @@ export const CreateWage = async (
   if (user === null) return;
 
   const docRef = await addDoc(collection(FIREBASE_DB, user.uid), {
+    totalHours: totalHours,
     shiftDate: shiftDate,
     startTime: startTime,
     endTime: endTime,
@@ -32,6 +34,7 @@ export const CreateWage = async (
 
 export interface WageObjectProps {
   docId: string;
+  totalHours: number;
   shiftDate: string;
   startTime: string;
   endTime: string;
@@ -55,6 +58,7 @@ export const GetWages = async (
       data.shiftDate = await convertTimestamp(data.shiftDate);
       wages.push({
         docId: doc.id,
+        totalHours: data.totalHours,
         shiftDate: data.shiftDate,
         startTime: data.startTime,
         endTime: data.endTime,

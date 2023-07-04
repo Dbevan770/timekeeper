@@ -11,6 +11,7 @@ const AddWages = () => {
   const [submitted, setSubmitted] = useState<boolean>(false);
   const [currency, setCurrency] = useState<string>("");
   const [totalEarned, setTotalEarned] = useState<string>("");
+  const [totalHours, setTotalHours] = useState<number>(0);
   const [shiftDate, setShiftDate] = useState<Date | null>(null);
   const [rate, setRate] = useState<string>("");
   const [startHour, setStartHour] = useState<string>("");
@@ -27,6 +28,7 @@ const AddWages = () => {
   const navigate = useNavigate();
 
   const handleSetSubmit = (
+    totalHours: number,
     shiftDate: Date | null,
     rate: string,
     currency: string,
@@ -40,6 +42,7 @@ const AddWages = () => {
     breaks: { hours: string; minutes: string }[]
   ) => {
     setSubmitted(true);
+    setTotalHours(totalHours);
     setShiftDate(shiftDate);
     setCurrency(currency);
     setTotalEarned(totalEarned);
@@ -55,6 +58,7 @@ const AddWages = () => {
 
   const handleResetForm = () => {
     setSubmitted(false);
+    setTotalHours(0);
     setShiftDate(null);
     setCurrency("");
     setTotalEarned("");
@@ -81,6 +85,7 @@ const AddWages = () => {
     }, 0);
     const result = await CreateWage(
       user,
+      totalHours,
       shiftDate,
       startTime,
       endTime,

@@ -9,7 +9,7 @@ const theme = createTheme({
       main: "#f151ff",
     },
     background: {
-      default: "#242424",
+      default: "#121212",
     },
   },
   components: {
@@ -121,8 +121,26 @@ const theme = createTheme({
     MuiPaper: {
       styleOverrides: {
         root: {
-          backgroundColor: "#242424",
+          backgroundColor: "#222222",
           color: "#e1e1e1",
+        },
+      },
+    },
+    MuiChip: {
+      styleOverrides: {
+        root: {
+          color: "#242424",
+          fontWeight: 500,
+        },
+      },
+    },
+    MuiCardContent: {
+      styleOverrides: {
+        root: {
+          padding: "1rem",
+          "&:last-child": {
+            paddingBottom: "1rem",
+          },
         },
       },
     },
