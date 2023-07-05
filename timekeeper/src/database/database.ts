@@ -1,7 +1,11 @@
 import { FIREBASE_DB } from "../firebaseConfig";
-import { collection, addDoc, getDocs } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  Timestamp as FirebaseTimestamp,
+} from "firebase/firestore";
 import { User as FirebaseUser } from "firebase/auth";
-import { convertTimestamp } from "../utils/convertTimestamp";
 
 export const CreateWage = async (
   user: FirebaseUser | null,
@@ -35,7 +39,7 @@ export const CreateWage = async (
 export interface WageObjectProps {
   docId: string;
   totalHours: number;
-  shiftDate: string;
+  shiftDate: FirebaseTimestamp;
   startTime: string;
   endTime: string;
   breaks: number;
@@ -55,7 +59,6 @@ export const GetWages = async (
 
     querySnapshot.forEach(async (doc) => {
       const data = doc.data();
-      data.shiftDate = await convertTimestamp(data.shiftDate);
       wages.push({
         docId: doc.id,
         totalHours: data.totalHours,

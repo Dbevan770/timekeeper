@@ -11,7 +11,7 @@ import Login from "./scenes/Login/Login.tsx";
 import Dashboard from "./scenes/Dashboard/Dashboard.tsx";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute.tsx";
 import theme from "./theme.tsx";
-import AddWages from "./scenes/Dashboard/AddWages/AddWages.tsx";
+import AddShift from "./scenes/Dashboard/AddWages/AddShift.tsx";
 import Success from "./scenes/Dashboard/AddWages/Success/Success.tsx";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
@@ -26,7 +26,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
             <Route path="/login" element={<Login />} />
             <Route element={<ProtectedRoute />}>
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/dashboard/add-wages" element={<AddWages />} />
+              <Route path="/dashboard/add-wages" element={<AddShift />} />
               <Route
                 path="/dashboard/add-wages/success"
                 element={<Success />}

@@ -4,9 +4,10 @@ import React from "react";
 interface MinuteInputProps {
   minute: string;
   setMin: React.Dispatch<React.SetStateAction<string>>;
+  disabled: boolean;
 }
 
-const MinuteInput = ({ minute, setMin }: MinuteInputProps) => {
+const MinuteInput = ({ minute, setMin, disabled }: MinuteInputProps) => {
   const handleMinuteChange = (
     value: string,
     setter: React.Dispatch<React.SetStateAction<string>>
@@ -27,6 +28,7 @@ const MinuteInput = ({ minute, setMin }: MinuteInputProps) => {
     <TextField
       value={minute}
       onChange={(e) => handleMinuteChange(e.target.value, setMin)}
+      disabled={disabled}
       variant="outlined"
       label="MM"
       id="start-time-min"

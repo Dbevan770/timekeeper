@@ -4,6 +4,8 @@ import {
   InputAdornment,
   Typography,
   Button,
+  Backdrop,
+  CircularProgress,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
@@ -34,6 +36,7 @@ interface WageFormProps {
 }
 
 const WageForm = ({ onSubmit }: WageFormProps) => {
+  const [loading, setLoading] = useState<boolean>(false);
   const [rate, setRate] = useState<string>("");
   const [shiftDate, setShiftDate] = useState<Date | null>(null);
   const [currency, setCurrency] = useState<string>("EUR");
@@ -85,6 +88,7 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setLoading(true);
 
     if (startHour === null || startHour === "0") return;
     if (endHour === null || endHour === "0") return;
@@ -140,15 +144,20 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
       earned,
       breaks
     );
+    setLoading(false);
   };
 
   return (
     <form id="add-wages-form" onSubmit={handleSubmit}>
+      <Backdrop open={loading} sx={{ color: "#fff", zIndex: 1 }}>
+        <CircularProgress color="primary" />
+      </Backdrop>
       <div className="currency-rate">
         <TextField
           id="select-currency"
           value={currency}
           onChange={(e) => setCurrency(e.target.value)}
+          disabled={loading}
           select
           label="Currency"
           defaultValue="EUR"
@@ -165,6 +174,7 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
           id="rate"
           value={rate}
           onChange={(e) => setRate(e.target.value)}
+          disabled={loading}
           variant="outlined"
           label="Rate"
           fullWidth
@@ -189,6 +199,7 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
           onChange={(date: Dayjs | null) =>
             setShiftDate(date?.toDate() ?? null)
           }
+          disabled={loading}
         />
       </LocalizationProvider>
       <TimeInput
@@ -199,6 +210,7 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
         setMin={setStartMin}
         meridian={startMeridian}
         setMeridian={setStartMeridian}
+        disabled={loading}
       />
       <TimeInput
         label="End Time"
@@ -208,13 +220,22 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
         setMin={setEndMin}
         meridian={endMeridian}
         setMeridian={setEndMeridian}
+        disabled={loading}
       />
       <div className="add-remove-breaks-container">
         <div className="add-remove-btns">
-          <Button variant="outlined" onClick={() => handleAddOrRemoveBreak(-1)}>
+          <Button
+            variant="outlined"
+            onClick={() => handleAddOrRemoveBreak(-1)}
+            disabled={loading}
+          >
             <RemoveIcon />
           </Button>
-          <Button variant="outlined" onClick={() => handleAddOrRemoveBreak(1)}>
+          <Button
+            variant="outlined"
+            onClick={() => handleAddOrRemoveBreak(1)}
+            disabled={loading}
+          >
             <AddIcon />
           </Button>
         </div>
@@ -225,10 +246,16 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
           breakValue={breakValue}
           onChange={handleBreakChange}
           index={index}
+          disabled={loading}
           key={index}
         />
       ))}
-      <Button variant="contained" type="submit" sx={{ marginTop: "1rem" }}>
+      <Button
+        variant="contained"
+        type="submit"
+        sx={{ marginTop: "1rem" }}
+        disabled={loading}
+      >
         Calculate
       </Button>
     </form>

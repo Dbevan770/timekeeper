@@ -4,10 +4,10 @@ import { Typography, Link, Button } from "@mui/material";
 import { CreateWage } from "../../../database/database";
 import { useAuthContext } from "../../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import "./AddWages.css";
+import "./AddShift.css";
 import Loading from "../../../components/Loading/Loading";
 
-const AddWages = () => {
+const AddShift = () => {
   const [submitted, setSubmitted] = useState<boolean>(false);
   const [currency, setCurrency] = useState<string>("");
   const [totalEarned, setTotalEarned] = useState<string>("");
@@ -80,7 +80,6 @@ const AddWages = () => {
     const totalBreakTime = breaks.reduce((acc, curr) => {
       const breakHours = parseInt(curr.hours) || 0;
       const breakMinutes = parseInt(curr.minutes) || 0;
-      // Convert breakHours to minutes and add it to breakMinutes
       return acc + breakHours * 60 + breakMinutes;
     }, 0);
     const result = await CreateWage(
@@ -143,4 +142,4 @@ const AddWages = () => {
   );
 };
 
-export default AddWages;
+export default AddShift;
