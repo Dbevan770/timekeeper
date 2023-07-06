@@ -124,10 +124,12 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
       return total + breakInHours;
     }, 0);
 
-    const earned = ((diffHours - totalBreaks) * parseFloat(rate)).toFixed(2);
+    const actualHoursWorked = diffHours - totalBreaks;
+
+    const earned = (actualHoursWorked * parseFloat(rate)).toFixed(2);
 
     onSubmit(
-      diffHours,
+      actualHoursWorked,
       shiftDate,
       rate,
       currency,

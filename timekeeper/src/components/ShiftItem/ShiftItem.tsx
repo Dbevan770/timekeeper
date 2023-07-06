@@ -19,7 +19,10 @@ const ShiftItem = ({ wage }: { wage: WageObjectProps }) => {
               : "$" + wage.totalEarned.toFixed(2)}
           </Typography>
           <div className="chip-container">
-            <Chip label={"Total Hours: " + wage.totalHours} color="primary" />
+            <Chip
+              label={"Total Hours: " + wage.totalHours.toFixed(2)}
+              color="primary"
+            />
           </div>
         </CardContent>
       </Card>
