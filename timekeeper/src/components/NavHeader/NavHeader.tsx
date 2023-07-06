@@ -1,17 +1,25 @@
-import { Typography, IconButton, Box } from "@mui/material";
+import { Typography, IconButton, Box, SwipeableDrawer } from "@mui/material";
+import NavDrawer from "../NavDrawer/NavDrawer";
 import { Menu } from "@mui/icons-material";
+import { useState } from "react";
 
 interface NavHeaderProps {
   label?: string;
-  toggleDrawer: () => void;
   icon?: React.ElementType;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const NavHeader = ({
   label,
-  toggleDrawer,
   icon: IconComponent,
+  setLoading,
 }: NavHeaderProps) => {
+  const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
+
+  const toggleDrawer = () => {
+    setDrawerOpen(!drawerOpen);
+  };
+
   return (
     <Box
       sx={{
@@ -42,6 +50,14 @@ const NavHeader = ({
       >
         <Menu sx={{ fontSize: "2rem" }} />
       </IconButton>
+      <SwipeableDrawer
+        anchor="right"
+        open={drawerOpen}
+        onClose={toggleDrawer}
+        onOpen={toggleDrawer}
+      >
+        <NavDrawer toggleDrawer={toggleDrawer} setLoading={setLoading} />
+      </SwipeableDrawer>
     </Box>
   );
 };

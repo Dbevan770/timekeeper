@@ -16,14 +16,27 @@ import {
 } from "@mui/icons-material";
 import "./NavDrawer.css";
 import { useNavigate } from "react-router";
+import SignOut from "../../auth/signout";
 
 interface NavDrawerProps {
   toggleDrawer: () => void;
-  handleSignOut: () => void;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const NavDrawer = ({ toggleDrawer, handleSignOut }: NavDrawerProps) => {
+const NavDrawer = ({ toggleDrawer, setLoading }: NavDrawerProps) => {
   const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    setLoading(true);
+    const { result, error } = await SignOut();
+
+    if (error) {
+      console.log(error);
+      setLoading(false);
+    }
+
+    console.log(result);
+  };
 
   const handleNavigate = (navigateUrl: string) => {
     navigate(navigateUrl);

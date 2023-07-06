@@ -1,42 +1,23 @@
 import { useAuthContext } from "../../context/AuthContext";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Typography, Button, Fab, SwipeableDrawer, Box } from "@mui/material";
+import { Typography, Button, Fab, Box } from "@mui/material";
 import { Add, Home } from "@mui/icons-material";
 import { GetWages, WageObjectProps } from "../../database/database";
-import SignOut from "../../auth/signout";
 import Loading from "../../components/Loading/Loading";
 import "./Dashboard.css";
 import NavHeader from "../../components/NavHeader/NavHeader";
-import NavDrawer from "../../components/NavDrawer/NavDrawer";
 import Widget from "../../components/Widget/Widget";
 
 const Dashboard = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [isLoadingWages, setIsLoadingWages] = useState<boolean>(false);
   const [wages, setWages] = useState<WageObjectProps[]>([]);
-  const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
   const { user } = useAuthContext();
   const navigate = useNavigate();
 
   const handleClick = () => {
     navigate("/dashboard/add-wages");
-  };
-
-  const handleSignOut = async () => {
-    setLoading(true);
-    const { result, error } = await SignOut();
-
-    if (error) {
-      console.log(error);
-      setLoading(false);
-    }
-
-    console.log(result);
-  };
-
-  const toggleDrawer = () => {
-    setDrawerOpen(!drawerOpen);
   };
 
   useEffect(() => {
@@ -83,22 +64,7 @@ const Dashboard = () => {
               <Add />
             </Fab>
           )}
-          <NavHeader
-            label="Dashboard"
-            toggleDrawer={toggleDrawer}
-            icon={Home}
-          />
-          <SwipeableDrawer
-            anchor="right"
-            open={drawerOpen}
-            onClose={toggleDrawer}
-            onOpen={toggleDrawer}
-          >
-            <NavDrawer
-              toggleDrawer={toggleDrawer}
-              handleSignOut={handleSignOut}
-            />
-          </SwipeableDrawer>
+          <NavHeader label="Dashboard" icon={Home} setLoading={setLoading} />
           <div className="dashboard-content">
             {isLoadingWages ? (
               <Loading label="Loading data..." />
