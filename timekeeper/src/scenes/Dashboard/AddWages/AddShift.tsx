@@ -1,11 +1,12 @@
 import WageForm from "../../../components/WageForm/WageForm";
 import { useState } from "react";
-import { Typography, Link, Button } from "@mui/material";
+import { Typography, Link, Button, Box } from "@mui/material";
 import { CreateWage } from "../../../database/database";
 import { useAuthContext } from "../../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import "./AddShift.css";
 import Loading from "../../../components/Loading/Loading";
+import SubPageHeader from "../../../components/SubPageHeader/SubPageHeader";
 
 const AddShift = () => {
   const [submitted, setSubmitted] = useState<boolean>(false);
@@ -101,9 +102,14 @@ const AddShift = () => {
   return (
     <>
       {!loading ? (
-        <div className="add-wages-container">
+        <Box sx={{ width: "100%", p: "0.5rem", height: "100vh" }}>
           {!submitted ? (
-            <WageForm onSubmit={handleSetSubmit} />
+            <Box
+              sx={{ height: "100%", display: "flex", flexDirection: "column" }}
+            >
+              <SubPageHeader label="Add Shift" navigateUrl="/dashboard" />
+              <WageForm onSubmit={handleSetSubmit} />
+            </Box>
           ) : (
             <div className="earned-wages-container">
               <Typography
@@ -134,7 +140,7 @@ const AddShift = () => {
               </Button>
             </div>
           )}
-        </div>
+        </Box>
       ) : (
         <Loading label="Saving..." />
       )}

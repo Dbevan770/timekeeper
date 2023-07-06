@@ -6,8 +6,16 @@ import {
   ListItemIcon,
   ListItemText,
 } from "@mui/material";
-import { Home } from "@mui/icons-material";
+import {
+  Home,
+  AttachMoney,
+  Person,
+  Settings,
+  Logout,
+  AccessTimeFilled,
+} from "@mui/icons-material";
 import "./NavDrawer.css";
+import { useNavigate } from "react-router";
 
 interface NavDrawerProps {
   toggleDrawer: () => void;
@@ -15,6 +23,11 @@ interface NavDrawerProps {
 }
 
 const NavDrawer = ({ toggleDrawer, handleSignOut }: NavDrawerProps) => {
+  const navigate = useNavigate();
+
+  const handleNavigate = (navigateUrl: string) => {
+    navigate(navigateUrl);
+  };
   return (
     <Box
       sx={{ width: "200px", height: "100%" }}
@@ -23,25 +36,39 @@ const NavDrawer = ({ toggleDrawer, handleSignOut }: NavDrawerProps) => {
     >
       <div className="side-drawer-items">
         <List>
-          {["Dashboard", "Earnings"].map((text) => (
-            <ListItem key={text} disablePadding>
-              <ListItemButton>
-                <ListItemIcon>
-                  <Home />
-                </ListItemIcon>
-                <ListItemText primary={text} />
+          {[
+            { label: "Dashboard", icon: <Home />, url: "/dashboard" },
+            { label: "Earnings", icon: <AttachMoney />, url: "/earnings" },
+            { label: "Shifts", icon: <AccessTimeFilled />, url: "/shifts" },
+          ].map(({ label, icon, url }) => (
+            <ListItem key={label} disablePadding>
+              <ListItemButton
+                onClick={url ? () => handleNavigate(url) : undefined}
+              >
+                <ListItemIcon>{icon}</ListItemIcon>
+                <ListItemText primary={label} />
               </ListItemButton>
             </ListItem>
           ))}
         </List>
         <List>
-          {["Account", "Settings", "Sign Out"].map((text, index) => (
-            <ListItem key={text} disablePadding>
-              <ListItemButton onClick={index === 2 ? handleSignOut : undefined}>
-                <ListItemIcon>
-                  <Home />
-                </ListItemIcon>
-                <ListItemText primary={text} />
+          {[
+            { label: "Account", icon: <Person />, url: "/account" },
+            { label: "Settings", icon: <Settings />, url: "/settings" },
+            { label: "Sign Out", icon: <Logout /> },
+          ].map(({ label, icon, url }, index) => (
+            <ListItem key={label} disablePadding>
+              <ListItemButton
+                onClick={
+                  index === 2
+                    ? handleSignOut
+                    : url
+                    ? () => handleNavigate(url)
+                    : undefined
+                }
+              >
+                <ListItemIcon>{icon}</ListItemIcon>
+                <ListItemText primary={label} />
               </ListItemButton>
             </ListItem>
           ))}

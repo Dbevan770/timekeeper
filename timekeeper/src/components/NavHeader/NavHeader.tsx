@@ -1,6 +1,5 @@
 import { Typography, IconButton, Box } from "@mui/material";
 import { Menu } from "@mui/icons-material";
-import "./NavHeader.css";
 
 interface NavHeaderProps {
   label?: string;
@@ -14,7 +13,22 @@ const NavHeader = ({
   icon: IconComponent,
 }: NavHeaderProps) => {
   return (
-    <div className="nav-header-container">
+    <Box
+      sx={{
+        position: "sticky",
+        top: "0",
+        left: "0",
+        height: "5%",
+        zIndex: "1",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        p: "0 0.5rem 0.5rem 1.5rem",
+        m: "0.5rem -0.5rem 0 -0.5rem",
+        borderBottom: "1px solid rgba(255,255,255,0.23)",
+        boxShadow: "0 5px 10px rgba(0, 0, 0, 0.6)",
+      }}
+    >
       <Box sx={{ display: "flex", gap: "1rem" }}>
         {IconComponent && <IconComponent />}
         <Typography variant="h5" sx={{ textAlign: "left" }}>
@@ -28,7 +42,7 @@ const NavHeader = ({
       >
         <Menu sx={{ fontSize: "2rem" }} />
       </IconButton>
-    </div>
+    </Box>
   );
 };
 

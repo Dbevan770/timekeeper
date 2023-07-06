@@ -70,7 +70,7 @@ const Widget = ({ label, wages, width = "half", content }: WidgetProps) => {
         >
           {label}
         </Typography>
-        <Typography variant="h1">
+        <Typography variant="h1" sx={{ textAlign: "left" }}>
           {content === "totalEarned"
             ? currencyFormatter(value)
             : value.toFixed(decimalPlaces())}
