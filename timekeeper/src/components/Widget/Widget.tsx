@@ -63,11 +63,8 @@ const Widget = ({ label, wages, width = "half", content }: WidgetProps) => {
     <Skeleton animation="wave" />
   ) : (
     <Box sx={{ gridColumn: width === "half" ? "span 1" : "span 2" }}>
-      <Paper sx={{ padding: "1rem" }}>
-        <Typography
-          variant="body1"
-          sx={{ textAlign: "left", color: "rgba(255,255,255,0.48)" }}
-        >
+      <Paper sx={{ padding: "1rem" }} elevation={3}>
+        <Typography variant="body1" className="WidgetTitle">
           {label}
         </Typography>
         <Typography variant="h1" sx={{ textAlign: "left" }}>

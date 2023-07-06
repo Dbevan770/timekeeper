@@ -50,9 +50,21 @@ const NavDrawer = ({ toggleDrawer, setLoading }: NavDrawerProps) => {
       <div className="side-drawer-items">
         <List>
           {[
-            { label: "Dashboard", icon: <Home />, url: "/dashboard" },
-            { label: "Earnings", icon: <AttachMoney />, url: "/earnings" },
-            { label: "Shifts", icon: <AccessTimeFilled />, url: "/shifts" },
+            {
+              label: "Dashboard",
+              icon: <Home className="NavIcon" />,
+              url: "/dashboard",
+            },
+            {
+              label: "Earnings",
+              icon: <AttachMoney className="NavIcon" />,
+              url: "/earnings",
+            },
+            {
+              label: "Shifts",
+              icon: <AccessTimeFilled className="NavIcon" />,
+              url: "/shifts",
+            },
           ].map(({ label, icon, url }) => (
             <ListItem key={label} disablePadding>
               <ListItemButton
@@ -66,9 +78,17 @@ const NavDrawer = ({ toggleDrawer, setLoading }: NavDrawerProps) => {
         </List>
         <List>
           {[
-            { label: "Account", icon: <Person />, url: "/account" },
-            { label: "Settings", icon: <Settings />, url: "/settings" },
-            { label: "Sign Out", icon: <Logout /> },
+            {
+              label: "Account",
+              icon: <Person className="NavIcon" />,
+              url: "/account",
+            },
+            {
+              label: "Settings",
+              icon: <Settings className="NavIcon" />,
+              url: "/settings",
+            },
+            { label: "Sign Out", icon: <Logout className="NavIcon" /> },
           ].map(({ label, icon, url }, index) => (
             <ListItem key={label} disablePadding>
               <ListItemButton
