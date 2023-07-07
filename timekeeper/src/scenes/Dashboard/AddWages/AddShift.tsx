@@ -1,13 +1,14 @@
 import WageForm from "../../../components/WageForm/WageForm";
 import { useState } from "react";
-import { Typography, Link, Button } from "@mui/material";
-import { CreateWage } from "../../../database/database";
-import { useAuthContext } from "../../../context/AuthContext";
+import { Typography, Link, Button, Box } from "@mui/material";
+import { CreateWageProps } from "../../../database/database";
+import { useWages } from "../../../context/WagesContext";
 import { useNavigate } from "react-router-dom";
-import "./AddWages.css";
+import "./AddShift.css";
 import Loading from "../../../components/Loading/Loading";
+import SubPageHeader from "../../../components/SubPageHeader/SubPageHeader";
 
-const AddWages = () => {
+const AddShift = () => {
   const [submitted, setSubmitted] = useState<boolean>(false);
   const [currency, setCurrency] = useState<string>("");
   const [totalEarned, setTotalEarned] = useState<string>("");
@@ -24,7 +25,7 @@ const AddWages = () => {
     Array<{ hours: string; minutes: string }>
   >([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const { user } = useAuthContext();
+  const { addWage, refreshWages } = useWages();
   const navigate = useNavigate();
 
   const handleSetSubmit = (
@@ -80,31 +81,41 @@ const AddWages = () => {
     const totalBreakTime = breaks.reduce((acc, curr) => {
       const breakHours = parseInt(curr.hours) || 0;
       const breakMinutes = parseInt(curr.minutes) || 0;
-      // Convert breakHours to minutes and add it to breakMinutes
       return acc + breakHours * 60 + breakMinutes;
     }, 0);
-    const result = await CreateWage(
-      user,
-      totalHours,
-      shiftDate,
-      startTime,
-      endTime,
-      totalBreaks,
-      totalBreakTime,
-      parseFloat(rate),
-      parseFloat(totalEarned),
-      currency
-    );
+    if (!shiftDate) return;
+    try {
+      const wage: CreateWageProps = {
+        totalHours: totalHours,
+        shiftDate: shiftDate,
+        startTime: startTime,
+        endTime: endTime,
+        breaks: totalBreaks,
+        breakTime: totalBreakTime,
+        rate: parseFloat(rate),
+        totalEarned: parseFloat(totalEarned),
+        currency: currency,
+      };
 
-    console.log(result);
+      await addWage(wage);
+      await refreshWages();
+    } catch (err) {
+      console.log(err);
+    }
+
     navigate("/dashboard/add-wages/success");
   };
   return (
     <>
       {!loading ? (
-        <div className="add-wages-container">
+        <Box sx={{ width: "100%", p: "0.5rem", height: "100dvh" }}>
           {!submitted ? (
-            <WageForm onSubmit={handleSetSubmit} />
+            <Box
+              sx={{ height: "100%", display: "flex", flexDirection: "column" }}
+            >
+              <SubPageHeader label="Add Shift" navigateUrl="/dashboard" />
+              <WageForm onSubmit={handleSetSubmit} />
+            </Box>
           ) : (
             <div className="earned-wages-container">
               <Typography
@@ -135,7 +146,7 @@ const AddWages = () => {
               </Button>
             </div>
           )}
-        </div>
+        </Box>
       ) : (
         <Loading label="Saving..." />
       )}
@@ -143,4 +154,4 @@ const AddWages = () => {
   );
 };
 
-export default AddWages;
+export default AddShift;

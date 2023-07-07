@@ -1,5 +1,7 @@
 .shift-item-container {
   width: 100%;
+  min-height: 8.625rem;
+  position: relative;
 }
 
 .chip-container {

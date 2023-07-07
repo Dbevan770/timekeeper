@@ -4,17 +4,22 @@ import {
   InputAdornment,
   Typography,
   Button,
+  Backdrop,
+  CircularProgress,
+  Box,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
+import { ThemeContext } from "../../context/ThemeContext";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Dayjs } from "dayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import "./WageForm.css";
 import BreakInput from "../BreakInput/BreakInput";
 import TimeInput from "../TimeInput/TimeInput";
+import dayjs from "dayjs";
 
 interface WageFormProps {
   onSubmit: (
@@ -34,9 +39,15 @@ interface WageFormProps {
 }
 
 const WageForm = ({ onSubmit }: WageFormProps) => {
-  const [rate, setRate] = useState<string>("");
-  const [shiftDate, setShiftDate] = useState<Date | null>(null);
-  const [currency, setCurrency] = useState<string>("EUR");
+  const { themeMode } = useContext(ThemeContext);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [rate, setRate] = useState<string>(
+    localStorage.getItem("defaultRate") || ""
+  );
+  const [shiftDate, setShiftDate] = useState<Date | null>(new Date());
+  const [currency, setCurrency] = useState<string>(
+    localStorage.getItem("defaultCurrency") || ""
+  );
   const [startHour, setStartHour] = useState<string>("");
   const [startMin, setStartMin] = useState<string>("");
   const [startMeridian, setStartMeridian] = useState<string>("AM");
@@ -46,6 +57,8 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
   const [breaks, setBreaks] = useState<
     Array<{ hours: string; minutes: string }>
   >([]);
+
+  const defaultRate = localStorage.getItem("defaultRate") || "";
 
   const currencies = [
     {
@@ -85,6 +98,7 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setLoading(true);
 
     if (startHour === null || startHour === "0") return;
     if (endHour === null || endHour === "0") return;
@@ -142,98 +156,135 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
       earned,
       breaks
     );
+    setLoading(false);
   };
 
   return (
-    <form id="add-wages-form" onSubmit={handleSubmit}>
-      <div className="currency-rate">
-        <TextField
-          id="select-currency"
-          value={currency}
-          onChange={(e) => setCurrency(e.target.value)}
-          select
-          label="Currency"
-          defaultValue="EUR"
-          fullWidth
-          sx={{ color: "rgba(255,255,255,0.23)" }}
-        >
-          {currencies.map((option) => (
-            <MenuItem key={option.value} value={option.value}>
-              {option.label}
-            </MenuItem>
-          ))}
-        </TextField>
-        <TextField
-          id="rate"
-          value={rate}
-          onChange={(e) => setRate(e.target.value)}
-          variant="outlined"
-          label="Rate"
-          fullWidth
-          required
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <Typography
-                  variant="body2"
-                  sx={{ color: "rgba(255,255,255,0.23)" }}
-                >
-                  /hr
-                </Typography>
-              </InputAdornment>
-            ),
-          }}
-        ></TextField>
-      </div>
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <DatePicker
-          label="Date of Shift"
-          onChange={(date: Dayjs | null) =>
-            setShiftDate(date?.toDate() ?? null)
-          }
-        />
-      </LocalizationProvider>
-      <TimeInput
-        label="Start Time"
-        hour={startHour}
-        setHour={setStartHour}
-        min={startMin}
-        setMin={setStartMin}
-        meridian={startMeridian}
-        setMeridian={setStartMeridian}
-      />
-      <TimeInput
-        label="End Time"
-        hour={endHour}
-        setHour={setEndHour}
-        min={endMin}
-        setMin={setEndMin}
-        meridian={endMeridian}
-        setMeridian={setEndMeridian}
-      />
-      <div className="add-remove-breaks-container">
-        <div className="add-remove-btns">
-          <Button variant="outlined" onClick={() => handleAddOrRemoveBreak(-1)}>
-            <RemoveIcon />
-          </Button>
-          <Button variant="outlined" onClick={() => handleAddOrRemoveBreak(1)}>
-            <AddIcon />
-          </Button>
+    <Box
+      sx={{
+        flex: "1 1 auto",
+        maxHeight: "calc(100vh - (100vh * 0.05))",
+        overflowY: "auto",
+        p: "0.75rem 2.5rem 0.75rem 2.5rem",
+      }}
+    >
+      <form id="add-wages-form" onSubmit={handleSubmit}>
+        <Backdrop open={loading} sx={{ color: "#fff", zIndex: 1 }}>
+          <CircularProgress color="primary" />
+        </Backdrop>
+        <div className="currency-rate">
+          <TextField
+            id="select-currency"
+            value={currency}
+            onChange={(e) => setCurrency(e.target.value)}
+            disabled={loading}
+            select
+            label="Currency"
+            defaultValue="EUR"
+            fullWidth
+          >
+            {currencies.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </TextField>
+          <TextField
+            id="rate"
+            defaultValue={defaultRate}
+            onChange={(e) => setRate(e.target.value)}
+            disabled={loading}
+            variant="outlined"
+            label="Rate"
+            fullWidth
+            required
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <Typography
+                    variant="body2"
+                    sx={{ color: "rgba(255,255,255,0.23)" }}
+                  >
+                    /hr
+                  </Typography>
+                </InputAdornment>
+              ),
+            }}
+            inputProps={{
+              style: {
+                color: themeMode === "dark" ? "#e1e1e1" : "#000000",
+              },
+            }}
+          ></TextField>
         </div>
-        <Typography variant="h6">Breaks: {breaks.length}</Typography>
-      </div>
-      {breaks.map((breakValue, index) => (
-        <BreakInput
-          breakValue={breakValue}
-          onChange={handleBreakChange}
-          index={index}
-          key={index}
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DatePicker
+            label="Date of Shift"
+            value={dayjs(shiftDate)}
+            onChange={(date: Dayjs | null) =>
+              setShiftDate(date?.toDate() ?? null)
+            }
+            disabled={loading}
+          />
+        </LocalizationProvider>
+        <TimeInput
+          label="Start Time"
+          hour={startHour}
+          setHour={setStartHour}
+          min={startMin}
+          setMin={setStartMin}
+          meridian={startMeridian}
+          setMeridian={setStartMeridian}
+          disabled={loading}
         />
-      ))}
-      <Button variant="contained" type="submit" sx={{ marginTop: "1rem" }}>
-        Calculate
-      </Button>
-    </form>
+        <TimeInput
+          label="End Time"
+          hour={endHour}
+          setHour={setEndHour}
+          min={endMin}
+          setMin={setEndMin}
+          meridian={endMeridian}
+          setMeridian={setEndMeridian}
+          disabled={loading}
+        />
+        <div className="add-remove-breaks-container">
+          <div className="add-remove-btns">
+            <Button
+              variant="outlined"
+              onClick={() => handleAddOrRemoveBreak(-1)}
+              disabled={loading}
+            >
+              <RemoveIcon />
+            </Button>
+            <Button
+              variant="outlined"
+              onClick={() => handleAddOrRemoveBreak(1)}
+              disabled={loading}
+            >
+              <AddIcon />
+            </Button>
+          </div>
+          <Typography variant="h6">Breaks: {breaks.length}</Typography>
+        </div>
+        {breaks.map((breakValue, index) => (
+          <BreakInput
+            breakValue={breakValue}
+            onChange={handleBreakChange}
+            index={index}
+            disabled={loading}
+            key={index}
+          />
+        ))}
+        <Button
+          variant="contained"
+          type="submit"
+          sx={{ marginTop: "1rem" }}
+          disabled={loading}
+        >
+          Calculate
+        </Button>
+      </form>
+    </Box>
   );
 };
 

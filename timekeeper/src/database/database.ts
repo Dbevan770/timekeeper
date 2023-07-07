@@ -1,41 +1,64 @@
 import { FIREBASE_DB } from "../firebaseConfig";
-import { collection, addDoc, getDocs } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  doc,
+  deleteDoc,
+  Timestamp as FirebaseTimestamp,
+} from "firebase/firestore";
 import { User as FirebaseUser } from "firebase/auth";
-import { convertTimestamp } from "../utils/convertTimestamp";
+
+export interface CreateWageProps {
+  totalHours: number;
+  shiftDate: Date;
+  startTime: string;
+  endTime: string;
+  breaks: number;
+  breakTime: number;
+  rate: number;
+  totalEarned: number;
+  currency: string;
+}
 
 export const CreateWage = async (
   user: FirebaseUser | null,
-  totalHours: number,
-  shiftDate: Date | null,
-  startTime: string,
-  endTime: string,
-  breaks: number,
-  breakTime: number,
-  rate: number,
-  totalEarned: number,
-  currency: string
+  wage: CreateWageProps
 ) => {
   if (user === null) return;
 
   const docRef = await addDoc(collection(FIREBASE_DB, user.uid), {
-    totalHours: totalHours,
-    shiftDate: shiftDate,
-    startTime: startTime,
-    endTime: endTime,
-    breaks: breaks,
-    breakTime: breakTime,
-    rate: rate,
-    totalEarned: totalEarned,
-    currency: currency,
+    totalHours: wage.totalHours,
+    shiftDate: wage.shiftDate,
+    startTime: wage.startTime,
+    endTime: wage.endTime,
+    breaks: wage.breaks,
+    breakTime: wage.breakTime,
+    rate: wage.rate,
+    totalEarned: wage.totalEarned,
+    currency: wage.currency,
   });
 
-  console.log(docRef.id);
+  const newShift: WageObjectProps = {
+    docId: docRef.id,
+    totalHours: wage.totalHours,
+    shiftDate: FirebaseTimestamp.fromDate(wage.shiftDate),
+    startTime: wage.startTime,
+    endTime: wage.endTime,
+    breaks: wage.breaks,
+    breakTime: wage.breakTime,
+    rate: wage.rate,
+    totalEarned: wage.totalEarned,
+    currency: wage.currency,
+  };
+
+  return newShift;
 };
 
 export interface WageObjectProps {
   docId: string;
   totalHours: number;
-  shiftDate: string;
+  shiftDate: FirebaseTimestamp;
   startTime: string;
   endTime: string;
   breaks: number;
@@ -55,7 +78,6 @@ export const GetWages = async (
 
     querySnapshot.forEach(async (doc) => {
       const data = doc.data();
-      data.shiftDate = await convertTimestamp(data.shiftDate);
       wages.push({
         docId: doc.id,
         totalHours: data.totalHours,
@@ -72,4 +94,12 @@ export const GetWages = async (
   }
 
   return wages;
+};
+
+export const DeleteWage = async (user: FirebaseUser, docId: string) => {
+  try {
+    await deleteDoc(doc(FIREBASE_DB, user.uid, docId));
+  } catch (err) {
+    console.log(err);
+  }
 };

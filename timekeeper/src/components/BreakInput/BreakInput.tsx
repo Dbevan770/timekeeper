@@ -9,9 +9,15 @@ interface BreakInputProps {
     index: number,
     breakValue: { hours: string; minutes: string }
   ) => void;
+  disabled: boolean;
 }
 
-const BreakInput = ({ index, breakValue, onChange }: BreakInputProps) => {
+const BreakInput = ({
+  index,
+  breakValue,
+  onChange,
+  disabled,
+}: BreakInputProps) => {
   const [currentBreakHours, setCurrentBreakHours] = useState<string>(
     breakValue.hours || ""
   );
@@ -40,7 +46,8 @@ const BreakInput = ({ index, breakValue, onChange }: BreakInputProps) => {
         key={`${index}-hours`}
         label={`Hours`}
         value={breakValue.hours}
-        onChange={handleBreakHoursChange} // Here
+        onChange={handleBreakHoursChange}
+        disabled={disabled}
         fullWidth
         required
       ></TextField>
@@ -49,7 +56,8 @@ const BreakInput = ({ index, breakValue, onChange }: BreakInputProps) => {
         key={`${index}-minutes`}
         label={`Minutes`}
         value={breakValue.minutes}
-        onChange={handleBreakMinutesChange} // Here
+        onChange={handleBreakMinutesChange}
+        disabled={disabled}
         fullWidth
         required
       ></TextField>

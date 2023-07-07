@@ -1,150 +1,242 @@
-import { createTheme } from "@mui/material";
+import { createTheme, responsiveFontSizes } from "@mui/material";
 
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: "#5fff51",
-    },
-    secondary: {
-      main: "#f151ff",
-    },
-    background: {
-      default: "#121212",
-    },
-  },
-  components: {
-    MuiTypography: {
-      styleOverrides: {
-        root: {
-          color: "#e1e1e1",
-          "&.MuiPickersToolbarText-root": {
-            color: "#e1e1e1",
-            "&.Mui-selected": {
-              color: "white",
-            },
-          },
-        },
-        overline: {
-          "&.MuiTypography-overline": {
-            color: "#e1e1e1",
-          },
-        },
-        caption: {
-          "&.MuiDayCalendar-weekDayLabel": {
-            color: "rgba(255,255,255,0.6)",
-          },
-        },
+const getTheme = (mode: "light" | "dark") => {
+  let theme = createTheme({
+    palette: {
+      mode: mode,
+      primary: {
+        main: mode === "dark" ? "#5fff51" : "#0f7cdb",
+      },
+      secondary: {
+        main: "#f151ff",
+      },
+      background: {
+        default: mode === "dark" ? "#121212" : "#ffffff",
+      },
+      text: {
+        primary: mode === "dark" ? "#e1e1e1" : "#000000",
       },
     },
-    MuiTextField: {
-      styleOverrides: {
-        root: {
-          "& .MuiInputLabel-root": {
-            color: "rgba(255,255,255,0.23)",
-            "&.Mui-focused": {
-              color: "#5fff51",
+    components: {
+      MuiTypography: {
+        styleOverrides: {
+          root: {
+            color: mode === "dark" ? "#e1e1e1" : "#000000",
+            "&.MuiPickersToolbarText-root": {
+              color: mode === "dark" ? "#e1e1e1" : "#000000",
+              "&.Mui-selected": {
+                color: "white",
+              },
             },
           },
-          "& .MuiOutlinedInput-root": {
-            fieldset: {
-              borderColor: "rgba(255,255,255,0.23)",
-              borderWidth: "2px",
+          h5: {
+            "&.NavHeaderText": {
+              color: mode === "dark" ? "#e1e1e1" : "#ffffff",
             },
-            "&:hover fieldset": {
-              borderColor: "rgba(255,255,255,0.23)",
+          },
+          body1: {
+            color:
+              mode === "dark" ? "rgba(255,255,255,0.48)" : "rgba(0,0,0,0.48)",
+            "&.WidgetTitle": {
+              color:
+                mode === "dark" ? "rgba(255,255,255,0.48)" : "rgba(0,0,0,0.48)",
+              textAlign: "left",
             },
-            "&.Mui-focused fieldset": {
-              borderColor: "#5fff51",
+          },
+          overline: {
+            "&.MuiTypography-overline": {
+              color: mode === "dark" ? "#e1e1e1" : "#000000",
+            },
+          },
+          caption: {
+            "&.MuiDayCalendar-weekDayLabel": {
+              color: "rgba(255,255,255,0.6)",
             },
           },
         },
       },
-      defaultProps: {
-        inputProps: {
-          style: {
-            color: "#e1e1e1",
-            borderColor: "#e1e1e1",
+      MuiTextField: {
+        styleOverrides: {
+          root: {
+            "& .MuiInputLabel-root": {
+              color: mode === "dark" ? "rgba(255,255,255,0.23)" : "#000000",
+              "&.Mui-focused": {
+                color: mode === "dark" ? "#5fff51" : "#0f7cdb",
+              },
+            },
+            "& .MuiOutlinedInput-root": {
+              fieldset: {
+                borderColor:
+                  mode === "dark"
+                    ? "rgba(255,255,255,0.23)"
+                    : "rgba(0,0,0,0.48)",
+                borderWidth: "2px",
+              },
+              "&:hover fieldset": {
+                borderColor: "rgba(255,255,255,0.23)",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: mode === "dark" ? "#5fff51" : "#0f7cdb",
+              },
+            },
+            "& .MuiInputBase-root": {
+              default: {
+                color: mode === "dark" ? "#e1e1e1" : "#000000",
+              },
+            },
+          },
+        },
+        defaultProps: {
+          inputProps: {
+            style: {
+              color: mode === "dark" ? "#e1e1e1" : "#000000",
+              borderColor: "#e1e1e1",
+            },
           },
         },
       },
-    },
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          fontSize: "1rem",
+      MuiInputBase: {
+        styleOverrides: {
+          input: {
+            color: mode === "dark" ? "#e1e1e1" : "#000000",
+          },
         },
-        outlined: {
-          color: "#e1e1e1",
-          borderWidth: "2px",
-          borderColor: "rgba(255,255,255,0.23)",
-          padding: ".25rem",
-          "&:hover": {
+      },
+      MuiInput: {
+        styleOverrides: {
+          input: {
+            color: mode === "dark" ? "#e1e1e1" : "#000000",
+          },
+        },
+      },
+      MuiButton: {
+        styleOverrides: {
+          root: {
+            fontSize: "1rem",
+          },
+          outlined: {
+            color: "#e1e1e1",
             borderWidth: "2px",
-            borderColor: "rgba(255,255,255,0.23)",
+            borderColor:
+              mode === "dark" ? "rgba(255,255,255,0.23)" : "rgba(0,0,0,0.48)",
+            padding: ".25rem",
+            "&:hover": {
+              borderWidth: "2px",
+              borderColor: "rgba(255,255,255,0.23)",
+            },
           },
         },
       },
-    },
-    MuiButtonBase: {
-      styleOverrides: {
-        root: {
-          "&.MuiPickersCalendarHeader-switchViewButton": {
+      MuiButtonBase: {
+        styleOverrides: {
+          root: {
+            "&.MuiPickersCalendarHeader-switchViewButton": {
+              color: mode === "dark" ? "#e1e1e1" : "#000000",
+            },
+            "&.MuiPickersArrowSwitcher-button": {
+              color: mode === "dark" ? "#e1e1e1" : "#000000",
+            },
+            "&.MuiPickersDay-root": {
+              color: mode === "dark" ? "#e1e1e1" : "#000000",
+            },
+          },
+        },
+      },
+      MuiSelect: {
+        styleOverrides: {
+          select: {
+            color: mode === "dark" ? "#e1e1e1" : "#000000",
+            textAlign: "left",
+          },
+          icon: {
+            color: "rgba(255,255,255,0.23)",
+          },
+        },
+      },
+      MuiOutlinedInput: {
+        styleOverrides: {
+          root: {
             color: "#e1e1e1",
           },
-          "&.MuiPickersArrowSwitcher-button": {
-            color: "#e1e1e1",
-          },
-          "&.MuiPickersDay-root": {
-            color: "#e1e1e1",
-          },
         },
       },
-    },
-    MuiSelect: {
-      styleOverrides: {
-        select: {
-          color: "#e1e1e1",
-          textAlign: "left",
-        },
-        icon: {
-          color: "rgba(255,255,255,0.23)",
-        },
-      },
-    },
-    MuiOutlinedInput: {
-      styleOverrides: {
-        root: {
-          color: "#e1e1e1",
-        },
-      },
-    },
-    MuiPaper: {
-      styleOverrides: {
-        root: {
-          backgroundColor: "#222222",
-          color: "#e1e1e1",
-        },
-      },
-    },
-    MuiChip: {
-      styleOverrides: {
-        root: {
-          color: "#242424",
-          fontWeight: 500,
-        },
-      },
-    },
-    MuiCardContent: {
-      styleOverrides: {
-        root: {
-          padding: "1rem",
-          "&:last-child": {
-            paddingBottom: "1rem",
+      MuiPaper: {
+        styleOverrides: {
+          root: {
+            backgroundColor: mode === "dark" ? "#222222" : "#ffffff",
+            color: mode === "dark" ? "#e1e1e1" : "#000000",
           },
         },
       },
+      MuiDrawer: {
+        styleOverrides: {
+          paperAnchorRight: {
+            backgroundColor: mode === "dark" ? "#222222" : "#0f7cdb",
+          },
+        },
+      },
+      MuiChip: {
+        styleOverrides: {
+          root: {
+            color: "#242424",
+            fontWeight: 500,
+          },
+        },
+      },
+      MuiCardContent: {
+        styleOverrides: {
+          root: {
+            padding: "1rem",
+            "&:last-child": {
+              paddingBottom: "1rem",
+            },
+            "& .MuiTypography-root": {
+              color: mode === "dark" ? "rgba(255,255,255,0.48)" : "#000000",
+            },
+          },
+        },
+      },
+      MuiListItemIcon: {
+        styleOverrides: {
+          root: {
+            color: mode === "dark" ? "#e1e1e1" : "#000000",
+          },
+        },
+      },
+      MuiSvgIcon: {
+        styleOverrides: {
+          root: {
+            color: mode === "dark" ? "#e1e1e1" : "#000000",
+          },
+          fontSizeMedium: {
+            color: mode === "dark" ? "#e1e1e1" : "#000000",
+            "&.NavIcon": {
+              color: mode === "dark" ? "#e1e1e1" : "#ffffff",
+            },
+            "&.FabIcon": {
+              color: mode === "dark" ? "#121212" : "#000000",
+            },
+          },
+        },
+      },
+      MuiListItemText: {
+        styleOverrides: {
+          primary: {
+            color: mode === "dark" ? "#e1e1e1" : "#000000",
+          },
+        },
+      },
+      MuiMenuItem: {
+        styleOverrides: {
+          root: {
+            color: mode === "dark" ? "#e1e1e1" : "#000000",
+          },
+        },
+      },
     },
-  },
-});
+  });
 
-export default theme;
+  return responsiveFontSizes(theme);
+};
+
+export default getTheme;
