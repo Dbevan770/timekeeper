@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Typography, Button, Fab, Box } from "@mui/material";
 import { Add, Home } from "@mui/icons-material";
-import { GetWages, WageObjectProps } from "../../database/database";
+import { useWages } from "../../context/WagesContext";
 import Loading from "../../components/Loading/Loading";
 import "./Dashboard.css";
 import NavHeader from "../../components/NavHeader/NavHeader";
@@ -11,8 +11,7 @@ import Widget from "../../components/Widget/Widget";
 
 const Dashboard = () => {
   const [loading, setLoading] = useState<boolean>(false);
-  const [isLoadingWages, setIsLoadingWages] = useState<boolean>(false);
-  const [wages, setWages] = useState<WageObjectProps[]>([]);
+  const { wages, isLoadingWages } = useWages();
   const { user } = useAuthContext();
   const navigate = useNavigate();
 
@@ -27,28 +26,6 @@ const Dashboard = () => {
     }
 
     setLoading(false);
-  }, [user]);
-
-  useEffect(() => {
-    const getWages = async () => {
-      setIsLoadingWages(true);
-      let result: WageObjectProps[] = [];
-      if (user) {
-        result = await GetWages(user);
-
-        const now = Date.now();
-        const oneWeekAgo = now - 7 * 24 * 60 * 60 * 1000;
-
-        result = result.filter(
-          (wage) => wage.shiftDate.toMillis() >= oneWeekAgo
-        );
-      }
-
-      setWages(result);
-      setIsLoadingWages(false);
-    };
-
-    getWages();
   }, [user]);
 
   return (

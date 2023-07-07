@@ -1,8 +1,8 @@
 import WageForm from "../../../components/WageForm/WageForm";
 import { useState } from "react";
 import { Typography, Link, Button, Box } from "@mui/material";
-import { CreateWage } from "../../../database/database";
-import { useAuthContext } from "../../../context/AuthContext";
+import { CreateWageProps } from "../../../database/database";
+import { useWages } from "../../../context/WagesContext";
 import { useNavigate } from "react-router-dom";
 import "./AddShift.css";
 import Loading from "../../../components/Loading/Loading";
@@ -25,7 +25,7 @@ const AddShift = () => {
     Array<{ hours: string; minutes: string }>
   >([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const { user } = useAuthContext();
+  const { addWage, refreshWages } = useWages();
   const navigate = useNavigate();
 
   const handleSetSubmit = (
@@ -83,26 +83,32 @@ const AddShift = () => {
       const breakMinutes = parseInt(curr.minutes) || 0;
       return acc + breakHours * 60 + breakMinutes;
     }, 0);
-    const result = await CreateWage(
-      user,
-      totalHours,
-      shiftDate,
-      startTime,
-      endTime,
-      totalBreaks,
-      totalBreakTime,
-      parseFloat(rate),
-      parseFloat(totalEarned),
-      currency
-    );
+    if (!shiftDate) return;
+    try {
+      const wage: CreateWageProps = {
+        totalHours: totalHours,
+        shiftDate: shiftDate,
+        startTime: startTime,
+        endTime: endTime,
+        breaks: totalBreaks,
+        breakTime: totalBreakTime,
+        rate: parseFloat(rate),
+        totalEarned: parseFloat(totalEarned),
+        currency: currency,
+      };
 
-    console.log(result);
+      await addWage(wage);
+      await refreshWages();
+    } catch (err) {
+      console.log(err);
+    }
+
     navigate("/dashboard/add-wages/success");
   };
   return (
     <>
       {!loading ? (
-        <Box sx={{ width: "100%", p: "0.5rem", height: "100vh" }}>
+        <Box sx={{ width: "100%", p: "0.5rem", height: "100dvh" }}>
           {!submitted ? (
             <Box
               sx={{ height: "100%", display: "flex", flexDirection: "column" }}

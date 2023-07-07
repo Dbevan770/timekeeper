@@ -1,6 +1,7 @@
 import { WageObjectProps } from "../../database/database";
 import { Paper, Typography, Box, Skeleton } from "@mui/material";
-import { useEffect, useState } from "react";
+import { ThemeContext } from "../../context/ThemeContext";
+import { useEffect, useState, useContext } from "react";
 
 interface WidgetProps {
   label: string;
@@ -16,6 +17,7 @@ interface WidgetProps {
 }
 
 const Widget = ({ label, wages, width = "half", content }: WidgetProps) => {
+  const { themeMode } = useContext(ThemeContext);
   const [value, setValue] = useState<number>(0);
 
   const currencyFormatter = (amount: number) => {
@@ -63,7 +65,7 @@ const Widget = ({ label, wages, width = "half", content }: WidgetProps) => {
     <Skeleton animation="wave" />
   ) : (
     <Box sx={{ gridColumn: width === "half" ? "span 1" : "span 2" }}>
-      <Paper sx={{ padding: "1rem" }} elevation={3}>
+      <Paper sx={{ padding: "1rem" }} elevation={themeMode === "dark" ? 0 : 3}>
         <Typography variant="body1" className="WidgetTitle">
           {label}
         </Typography>
