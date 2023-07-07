@@ -39,9 +39,13 @@ interface WageFormProps {
 
 const WageForm = ({ onSubmit }: WageFormProps) => {
   const [loading, setLoading] = useState<boolean>(false);
-  const [rate, setRate] = useState<string>("");
+  const [rate, setRate] = useState<string>(
+    localStorage.getItem("defaultRate") || ""
+  );
   const [shiftDate, setShiftDate] = useState<Date | null>(new Date());
-  const [currency, setCurrency] = useState<string>("EUR");
+  const [currency, setCurrency] = useState<string>(
+    localStorage.getItem("defaultCurrency") || ""
+  );
   const [startHour, setStartHour] = useState<string>("");
   const [startMin, setStartMin] = useState<string>("");
   const [startMeridian, setStartMeridian] = useState<string>("AM");
@@ -51,6 +55,8 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
   const [breaks, setBreaks] = useState<
     Array<{ hours: string; minutes: string }>
   >([]);
+
+  const defaultRate = localStorage.getItem("defaultRate") || "";
 
   const currencies = [
     {
@@ -185,6 +191,7 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
           <TextField
             id="rate"
             value={rate}
+            defaultValue={defaultRate}
             onChange={(e) => setRate(e.target.value)}
             disabled={loading}
             variant="outlined"

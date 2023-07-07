@@ -15,18 +15,28 @@ import { useWages } from "../../context/WagesContext";
 import "./ShiftItem.css";
 
 const ShiftItem = ({ wage }: { wage: WageObjectProps }) => {
-  const [open, setOpen] = useState<boolean>(false);
+  const [swipeDist, setSwipeDist] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
   const { deleteWage, refreshWages } = useWages();
   const handlers = useSwipeable({
-    onSwipedLeft: () => {
+    onSwiping: (eventData) => {
       if (!loading) {
-        setOpen(true);
+        if (eventData.deltaX < 0) {
+          setSwipeDist(Math.min(Math.abs(eventData.deltaX), 128));
+        } else if (eventData.deltaX > 0 && swipeDist > 0) {
+          setSwipeDist(Math.max(0, swipeDist - eventData.deltaX / 2));
+        }
       }
     },
-    onSwipedRight: () => {
-      if (!loading) {
-        setOpen(false);
+    onSwiped: () => {
+      // If the swipe distance exceeds 50% of the maximum, set it to the maximum
+      if (swipeDist > 96) {
+        setSwipeDist(96);
+      } else if (swipeDist >= 48) {
+        setSwipeDist(96);
+      } else {
+        // Otherwise, reset the swipe distance after the swipe is completed
+        setSwipeDist(0);
       }
     },
     trackMouse: true,
@@ -45,7 +55,7 @@ const ShiftItem = ({ wage }: { wage: WageObjectProps }) => {
   };
 
   useEffect(() => {
-    setOpen(false);
+    setSwipeDist(0);
   }, [wage]);
 
   return (
@@ -69,28 +79,43 @@ const ShiftItem = ({ wage }: { wage: WageObjectProps }) => {
       <Box sx={{ display: "flex", alignItems: "center", height: "8.625rem" }}>
         <Card
           sx={{
-            minWidth: open ? "calc(100% - 6rem)" : "100%",
+            minWidth: swipeDist > 0 ? `calc(100% - ${swipeDist}px)` : "100%",
             transition:
               "min-width 0.2s ease, border-top-right-radius 0.2s ease, border-bottom-right-radius 0.2s ease",
-            borderTopRightRadius: open ? "0" : "0.25rem",
-            borderBottomRightRadius: open ? "0" : "0.25rem",
+            borderTopRightRadius: swipeDist > 0 ? "0" : "0.25rem",
+            borderBottomRightRadius: swipeDist > 0 ? "0" : "0.25rem",
             height: "100%",
           }}
         >
-          <CardContent sx={{ minWidth: "100%" }}>
+          <CardContent
+            sx={{
+              minWidth: "100%",
+              height: "100%",
+              p: "1rem 1rem 0.5rem 1rem",
+            }}
+          >
             <Typography
-              variant="subtitle1"
-              sx={{ textAlign: "left", color: "rgba(255,255,255,0.48)" }}
+              variant="body1"
+              sx={{
+                textAlign: "left",
+                color: "rgba(255,255,255,0.48)",
+                fontSize: ".875rem",
+              }}
             >
-              {wage.shiftDate.toDate().toLocaleDateString()}
+              {wage.shiftDate.toDate().toLocaleDateString() +
+                " - " +
+                wage.shiftDate
+                  .toDate()
+                  .toLocaleDateString("en-us", { weekday: "long" })}
             </Typography>
-            <Typography variant="h2" sx={{ fontWeight: "400" }}>
+            <Typography variant="h1" sx={{ fontWeight: "400" }}>
               {wage.currency === "EUR"
                 ? wage.totalEarned.toFixed(2) + "€"
                 : "$" + wage.totalEarned.toFixed(2)}
             </Typography>
             <div className="chip-container">
               <Chip
+                size="small"
                 label={"Total Hours: " + wage.totalHours.toFixed(2)}
                 color="primary"
               />
@@ -99,8 +124,8 @@ const ShiftItem = ({ wage }: { wage: WageObjectProps }) => {
         </Card>
         <Box
           sx={{
-            width: open ? "6rem" : "0",
-            opacity: open ? 1 : 0,
+            width: swipeDist > 0 ? `${swipeDist}px` : "0",
+            opacity: swipeDist > 0 ? 1 : 0,
             transition: "opacity 0.2s ease, width 0.2s ease",
             height: "inherit",
             display: "flex",
@@ -115,7 +140,10 @@ const ShiftItem = ({ wage }: { wage: WageObjectProps }) => {
           <IconButton onClick={handleDelete}>
             <Delete
               fontSize="large"
-              sx={{ opacity: open ? 1 : 0, transition: "opacity 0.2s ease" }}
+              sx={{
+                opacity: swipeDist > 0 ? `calc(${swipeDist / 96})` : 0,
+                transition: "opacity 0.2s ease",
+              }}
             />
           </IconButton>
         </Box>

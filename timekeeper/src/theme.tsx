@@ -181,9 +181,12 @@ const getTheme = (mode: "light" | "dark") => {
             color: mode === "dark" ? "#e1e1e1" : "black",
           },
           fontSizeMedium: {
-            color: mode === "dark" ? "#121212" : "black",
+            color: mode === "dark" ? "#e1e1e1" : "black",
             "&.NavIcon": {
               color: mode === "dark" ? "#e1e1e1" : "#ffffff",
+            },
+            "&.FabIcon": {
+              color: mode === "dark" ? "#121212" : "black",
             },
           },
         },

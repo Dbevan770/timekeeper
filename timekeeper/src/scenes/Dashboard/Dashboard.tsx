@@ -38,7 +38,7 @@ const Dashboard = () => {
               sx={{ position: "absolute", bottom: "2rem", right: "2rem" }}
               onClick={handleClick}
             >
-              <Add />
+              <Add className="FabIcon" />
             </Fab>
           )}
           <NavHeader label="Dashboard" icon={Home} setLoading={setLoading} />
@@ -46,46 +46,62 @@ const Dashboard = () => {
             {isLoadingWages ? (
               <Loading label="Loading data..." />
             ) : wages.length > 0 ? (
-              <Box
-                sx={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(2, 1fr)",
-                  gap: "0.5rem",
-                  marginTop: "0.5rem",
-                }}
-              >
-                <Widget
-                  label="Total Earnings"
-                  width="full"
-                  wages={wages}
-                  content="totalEarned"
-                  contentType="currency"
-                />
-                <Widget
-                  label="Total Hours"
-                  wages={wages}
-                  content="totalHours"
-                  contentType="float"
-                />
-                <Widget
-                  label="Total Shifts"
-                  wages={wages}
-                  content="totalShifts"
-                  contentType="int"
-                />
-                <Widget
-                  label="Total Breaks"
-                  wages={wages}
-                  content="breaks"
-                  contentType="int"
-                />
-                <Widget
-                  label="Total Break Time"
-                  wages={wages}
-                  content="breakTime"
-                  contentType="float"
-                />
-              </Box>
+              <>
+                <Box
+                  sx={{
+                    mt: "0.75rem",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    p: "0 1rem",
+                  }}
+                >
+                  <Typography variant="h4">
+                    Hello {user?.displayName}!
+                  </Typography>
+                  <Typography variant="body1">&lt; 7days</Typography>
+                </Box>
+                <Box
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(2, 1fr)",
+                    gap: "0.5rem",
+                    marginTop: "0.5rem",
+                  }}
+                >
+                  <Widget
+                    label="Total Earnings"
+                    width="full"
+                    wages={wages}
+                    content="totalEarned"
+                    contentType="currency"
+                  />
+                  <Widget
+                    label="Total Hours"
+                    wages={wages}
+                    content="totalHours"
+                    contentType="float"
+                  />
+                  <Widget
+                    label="Total Shifts"
+                    wages={wages}
+                    content="totalShifts"
+                    contentType="int"
+                  />
+                  <Widget
+                    label="Total Breaks"
+                    wages={wages}
+                    content="breaks"
+                    contentType="int"
+                  />
+                  <Widget
+                    label="Total Break Time"
+                    wages={wages}
+                    content="breakTime"
+                    contentType="float"
+                  />
+                </Box>
+              </>
             ) : (
               <div className="empty-content">
                 <Typography
