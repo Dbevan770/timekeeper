@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import { Settings } from "@mui/icons-material";
 import NavHeader from "../../components/NavHeader/NavHeader";
+import Loading from "../../components/Loading/Loading";
 import { useContext, useState, useRef, useEffect } from "react";
 import { ThemeContext } from "../../context/ThemeContext";
 
@@ -20,7 +21,7 @@ const SettingsPage = () => {
     localStorage.getItem("defaultRate") || ""
   );
   const [currency, setCurrency] = useState<string>(
-    localStorage.getItem("defaultCurrency") || "EUR"
+    localStorage.getItem("defaultCurrency") || ""
   );
   const { switchThemeMode, themeMode } = useContext(ThemeContext);
 
@@ -56,40 +57,51 @@ const SettingsPage = () => {
   }, []);
 
   return (
-    <Box sx={{ width: "100%", height: "100dvh", p: "0.5rem" }}>
-      <NavHeader label="Settings" icon={Settings} setLoading={setLoading} />
-      <Box sx={{ height: "calc(100% - (5% + 1rem))", mt: "0.5rem" }}>
-        <List>
-          <ListItem>
-            <ListItemText primary="Dark Mode" />
-            <Switch
-              checked={themeMode === "dark"}
-              onChange={() => switchThemeMode()}
-            />
-          </ListItem>
-          <ListItem>
-            <ListItemText primary="Default Pay Rate" />
-            <TextField
-              sx={{ maxWidth: "3rem", textAlign: "center" }}
-              variant="standard"
-              value={rate}
-              onChange={(e) => handleRateChange(e.target.value)}
-            />
-          </ListItem>
-          <ListItem>
-            <ListItemText primary="Default Currency" />
-            <Select
-              value={currency}
-              sx={{ width: "6rem" }}
-              onChange={handleCurrencyChange}
-            >
-              <MenuItem value="EUR">EUR</MenuItem>
-              <MenuItem value="USD">USD</MenuItem>
-            </Select>
-          </ListItem>
-        </List>
-      </Box>
-    </Box>
+    <>
+      {!loading ? (
+        <Box sx={{ width: "100%", height: "100dvh", p: "0.5rem" }}>
+          <NavHeader label="Settings" icon={Settings} setLoading={setLoading} />
+          <Box sx={{ height: "calc(100% - (5% + 1rem))", mt: "0.5rem" }}>
+            <List>
+              <ListItem>
+                <ListItemText primary="Dark Mode" />
+                <Switch
+                  checked={themeMode === "dark"}
+                  onChange={() => switchThemeMode()}
+                />
+              </ListItem>
+              <ListItem>
+                <ListItemText primary="Default Pay Rate" />
+                <TextField
+                  sx={{ maxWidth: "3rem", textAlign: "center" }}
+                  variant="standard"
+                  value={rate}
+                  onChange={(e) => handleRateChange(e.target.value)}
+                  inputProps={{
+                    style: {
+                      color: themeMode === "dark" ? "#e1e1e1" : "black",
+                    },
+                  }}
+                />
+              </ListItem>
+              <ListItem>
+                <ListItemText primary="Default Currency" />
+                <Select
+                  value={currency}
+                  sx={{ width: "6rem" }}
+                  onChange={handleCurrencyChange}
+                >
+                  <MenuItem value="EUR">EUR</MenuItem>
+                  <MenuItem value="USD">USD</MenuItem>
+                </Select>
+              </ListItem>
+            </List>
+          </Box>
+        </Box>
+      ) : (
+        <Loading label="Loading..." />
+      )}
+    </>
   );
 };
 

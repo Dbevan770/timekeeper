@@ -10,11 +10,12 @@ import {
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
+import { ThemeContext } from "../../context/ThemeContext";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Dayjs } from "dayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import "./WageForm.css";
 import BreakInput from "../BreakInput/BreakInput";
 import TimeInput from "../TimeInput/TimeInput";
@@ -38,6 +39,7 @@ interface WageFormProps {
 }
 
 const WageForm = ({ onSubmit }: WageFormProps) => {
+  const { themeMode } = useContext(ThemeContext);
   const [loading, setLoading] = useState<boolean>(false);
   const [rate, setRate] = useState<string>(
     localStorage.getItem("defaultRate") || ""
@@ -180,7 +182,6 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
             label="Currency"
             defaultValue="EUR"
             fullWidth
-            sx={{ color: "rgba(255,255,255,0.23)" }}
           >
             {currencies.map((option) => (
               <MenuItem key={option.value} value={option.value}>
@@ -190,7 +191,6 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
           </TextField>
           <TextField
             id="rate"
-            value={rate}
             defaultValue={defaultRate}
             onChange={(e) => setRate(e.target.value)}
             disabled={loading}
@@ -209,6 +209,11 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
                   </Typography>
                 </InputAdornment>
               ),
+            }}
+            inputProps={{
+              style: {
+                color: themeMode === "dark" ? "#e1e1e1" : "#000000",
+              },
             }}
           ></TextField>
         </div>

@@ -14,16 +14,16 @@ const getTheme = (mode: "light" | "dark") => {
         default: mode === "dark" ? "#121212" : "#ffffff",
       },
       text: {
-        primary: "#e1e1e1",
+        primary: mode === "dark" ? "#e1e1e1" : "#000000",
       },
     },
     components: {
       MuiTypography: {
         styleOverrides: {
           root: {
-            color: mode === "dark" ? "#e1e1e1" : "black",
+            color: mode === "dark" ? "#e1e1e1" : "#000000",
             "&.MuiPickersToolbarText-root": {
-              color: "#e1e1e1",
+              color: mode === "dark" ? "#e1e1e1" : "#000000",
               "&.Mui-selected": {
                 color: "white",
               },
@@ -35,6 +35,8 @@ const getTheme = (mode: "light" | "dark") => {
             },
           },
           body1: {
+            color:
+              mode === "dark" ? "rgba(255,255,255,0.48)" : "rgba(0,0,0,0.48)",
             "&.WidgetTitle": {
               color:
                 mode === "dark" ? "rgba(255,255,255,0.48)" : "rgba(0,0,0,0.48)",
@@ -43,7 +45,7 @@ const getTheme = (mode: "light" | "dark") => {
           },
           overline: {
             "&.MuiTypography-overline": {
-              color: "#e1e1e1",
+              color: mode === "dark" ? "#e1e1e1" : "#000000",
             },
           },
           caption: {
@@ -57,21 +59,29 @@ const getTheme = (mode: "light" | "dark") => {
         styleOverrides: {
           root: {
             "& .MuiInputLabel-root": {
-              color: "rgba(255,255,255,0.23)",
+              color: mode === "dark" ? "rgba(255,255,255,0.23)" : "#000000",
               "&.Mui-focused": {
-                color: "#5fff51",
+                color: mode === "dark" ? "#5fff51" : "#0f7cdb",
               },
             },
             "& .MuiOutlinedInput-root": {
               fieldset: {
-                borderColor: "rgba(255,255,255,0.23)",
+                borderColor:
+                  mode === "dark"
+                    ? "rgba(255,255,255,0.23)"
+                    : "rgba(0,0,0,0.48)",
                 borderWidth: "2px",
               },
               "&:hover fieldset": {
                 borderColor: "rgba(255,255,255,0.23)",
               },
               "&.Mui-focused fieldset": {
-                borderColor: "#5fff51",
+                borderColor: mode === "dark" ? "#5fff51" : "#0f7cdb",
+              },
+            },
+            "& .MuiInputBase-root": {
+              default: {
+                color: mode === "dark" ? "#e1e1e1" : "#000000",
               },
             },
           },
@@ -79,9 +89,23 @@ const getTheme = (mode: "light" | "dark") => {
         defaultProps: {
           inputProps: {
             style: {
-              color: "#e1e1e1",
+              color: mode === "dark" ? "#e1e1e1" : "#000000",
               borderColor: "#e1e1e1",
             },
+          },
+        },
+      },
+      MuiInputBase: {
+        styleOverrides: {
+          input: {
+            color: mode === "dark" ? "#e1e1e1" : "#000000",
+          },
+        },
+      },
+      MuiInput: {
+        styleOverrides: {
+          input: {
+            color: mode === "dark" ? "#e1e1e1" : "#000000",
           },
         },
       },
@@ -93,7 +117,8 @@ const getTheme = (mode: "light" | "dark") => {
           outlined: {
             color: "#e1e1e1",
             borderWidth: "2px",
-            borderColor: "rgba(255,255,255,0.23)",
+            borderColor:
+              mode === "dark" ? "rgba(255,255,255,0.23)" : "rgba(0,0,0,0.48)",
             padding: ".25rem",
             "&:hover": {
               borderWidth: "2px",
@@ -106,13 +131,13 @@ const getTheme = (mode: "light" | "dark") => {
         styleOverrides: {
           root: {
             "&.MuiPickersCalendarHeader-switchViewButton": {
-              color: "#e1e1e1",
+              color: mode === "dark" ? "#e1e1e1" : "#000000",
             },
             "&.MuiPickersArrowSwitcher-button": {
-              color: "#e1e1e1",
+              color: mode === "dark" ? "#e1e1e1" : "#000000",
             },
             "&.MuiPickersDay-root": {
-              color: "#e1e1e1",
+              color: mode === "dark" ? "#e1e1e1" : "#000000",
             },
           },
         },
@@ -120,7 +145,7 @@ const getTheme = (mode: "light" | "dark") => {
       MuiSelect: {
         styleOverrides: {
           select: {
-            color: "#e1e1e1",
+            color: mode === "dark" ? "#e1e1e1" : "#000000",
             textAlign: "left",
           },
           icon: {
@@ -139,14 +164,14 @@ const getTheme = (mode: "light" | "dark") => {
         styleOverrides: {
           root: {
             backgroundColor: mode === "dark" ? "#222222" : "#ffffff",
-            color: "#e1e1e1",
+            color: mode === "dark" ? "#e1e1e1" : "#000000",
           },
         },
       },
       MuiDrawer: {
         styleOverrides: {
           paperAnchorRight: {
-            backgroundColor: mode === "dark" ? "#222222" : "#0f16db",
+            backgroundColor: mode === "dark" ? "#222222" : "#0f7cdb",
           },
         },
       },
@@ -171,22 +196,22 @@ const getTheme = (mode: "light" | "dark") => {
       MuiListItemIcon: {
         styleOverrides: {
           root: {
-            color: mode === "dark" ? "#e1e1e1" : "black",
+            color: mode === "dark" ? "#e1e1e1" : "#000000",
           },
         },
       },
       MuiSvgIcon: {
         styleOverrides: {
           root: {
-            color: mode === "dark" ? "#e1e1e1" : "black",
+            color: mode === "dark" ? "#e1e1e1" : "#000000",
           },
           fontSizeMedium: {
-            color: mode === "dark" ? "#e1e1e1" : "black",
+            color: mode === "dark" ? "#e1e1e1" : "#000000",
             "&.NavIcon": {
               color: mode === "dark" ? "#e1e1e1" : "#ffffff",
             },
             "&.FabIcon": {
-              color: mode === "dark" ? "#121212" : "black",
+              color: mode === "dark" ? "#121212" : "#000000",
             },
           },
         },
@@ -194,7 +219,14 @@ const getTheme = (mode: "light" | "dark") => {
       MuiListItemText: {
         styleOverrides: {
           primary: {
-            color: mode === "dark" ? "#e1e1e1" : "#ffffff",
+            color: mode === "dark" ? "#e1e1e1" : "#000000",
+          },
+        },
+      },
+      MuiMenuItem: {
+        styleOverrides: {
+          root: {
+            color: mode === "dark" ? "#e1e1e1" : "#000000",
           },
         },
       },

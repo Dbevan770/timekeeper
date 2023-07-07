@@ -37,7 +37,7 @@ const NavHeader = ({
         m: "-0.5rem -0.5rem 0 -0.5rem",
         borderBottom: "1px solid rgba(255,255,255,0.23)",
         boxShadow: "0 5px 10px rgba(0, 0, 0, 0.6)",
-        backgroundColor: theme.palette.mode === "dark" ? "#121212" : "#0f16db",
+        backgroundColor: theme.palette.mode === "dark" ? "#121212" : "#0f7cdb",
       }}
     >
       <Box sx={{ display: "flex", gap: "1rem" }}>

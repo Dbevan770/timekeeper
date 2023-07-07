@@ -16,6 +16,8 @@ import {
 } from "@mui/icons-material";
 import "./NavDrawer.css";
 import { useNavigate } from "react-router";
+import { ThemeContext } from "../../context/ThemeContext";
+import { useContext } from "react";
 import SignOut from "../../auth/signout";
 
 interface NavDrawerProps {
@@ -25,6 +27,7 @@ interface NavDrawerProps {
 
 const NavDrawer = ({ toggleDrawer, setLoading }: NavDrawerProps) => {
   const navigate = useNavigate();
+  const { themeMode } = useContext(ThemeContext);
 
   const handleSignOut = async () => {
     setLoading(true);
@@ -71,7 +74,17 @@ const NavDrawer = ({ toggleDrawer, setLoading }: NavDrawerProps) => {
                 onClick={url ? () => handleNavigate(url) : undefined}
               >
                 <ListItemIcon>{icon}</ListItemIcon>
-                <ListItemText primary={label} />
+                <ListItemText
+                  primary={
+                    <span
+                      style={{
+                        color: themeMode === "dark" ? "#e1e1e1" : "#ffffff",
+                      }}
+                    >
+                      {label}
+                    </span>
+                  }
+                />
               </ListItemButton>
             </ListItem>
           ))}
@@ -101,7 +114,17 @@ const NavDrawer = ({ toggleDrawer, setLoading }: NavDrawerProps) => {
                 }
               >
                 <ListItemIcon>{icon}</ListItemIcon>
-                <ListItemText primary={label} />
+                <ListItemText
+                  primary={
+                    <span
+                      style={{
+                        color: themeMode === "dark" ? "#e1e1e1" : "#ffffff",
+                      }}
+                    >
+                      {label}
+                    </span>
+                  }
+                />
               </ListItemButton>
             </ListItem>
           ))}
