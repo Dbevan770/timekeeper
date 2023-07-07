@@ -190,6 +190,9 @@ const getTheme = (mode: "light" | "dark") => {
             "&:last-child": {
               paddingBottom: "1rem",
             },
+            "& .MuiTypography-root": {
+              color: mode === "dark" ? "rgba(255,255,255,0.48)" : "#000000",
+            },
           },
         },
       },
