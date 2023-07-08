@@ -29,6 +29,9 @@ const getTheme = (mode: "light" | "dark") => {
               },
             },
           },
+          h1: {
+            color: mode == "dark" ? "#e1e1e1" : "#000000",
+          },
           h5: {
             "&.NavHeaderText": {
               color: mode === "dark" ? "#e1e1e1" : "#ffffff",
@@ -191,7 +194,9 @@ const getTheme = (mode: "light" | "dark") => {
               paddingBottom: "1rem",
             },
             "& .MuiTypography-root": {
-              color: mode === "dark" ? "rgba(255,255,255,0.48)" : "#000000",
+              "& .MuiTypography-h1": {
+                color: mode === "dark" ? "#e1e1e1" : "#000000",
+              },
             },
           },
         },
