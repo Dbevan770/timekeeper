@@ -14,32 +14,40 @@ import { useSwipeable } from "react-swipeable";
 import { useWages } from "../../context/WagesContext";
 import "./ShiftItem.css";
 
-const ShiftItem = ({ wage }: { wage: WageObjectProps }) => {
+interface ShiftItemProps {
+  wage: WageObjectProps;
+  setStopScroll: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const ShiftItem = ({ wage, setStopScroll }: ShiftItemProps) => {
+  const [isSwiping, setIsSwiping] = useState<boolean>(false);
   const [swipeDist, setSwipeDist] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
   const { deleteWage, refreshWages } = useWages();
+  let timer: ReturnType<typeof setTimeout> | undefined = undefined;
 
   const handlers = useSwipeable({
+    onSwipeStart: () => {
+      setStopScroll(true);
+      setIsSwiping(true);
+    },
     onSwiping: (eventData) => {
       if (!loading) {
         let newSwipeDist = swipeDist;
         if (eventData.dir === "Left") {
-          newSwipeDist = Math.min(
-            swipeDist + Math.abs(eventData.deltaX / 2),
-            128
-          );
+          newSwipeDist = Math.min(Math.abs(eventData.deltaX), 250);
         } else if (eventData.dir === "Right") {
-          newSwipeDist = Math.max(
-            0,
-            swipeDist - Math.abs(eventData.deltaX / 2)
-          );
+          newSwipeDist = Math.max(0, swipeDist - eventData.deltaX);
         }
         setSwipeDist(newSwipeDist);
       }
     },
     onSwipedLeft: () => {
-      if (swipeDist >= 48) {
-        setSwipeDist(96);
+      if (swipeDist >= 183) {
+        setSwipeDist(366);
+        timer = setTimeout(() => handleDelete(), 300);
+      } else if (swipeDist >= 26) {
+        setSwipeDist(51);
       } else {
         setSwipeDist(0);
       }
@@ -47,8 +55,11 @@ const ShiftItem = ({ wage }: { wage: WageObjectProps }) => {
     onSwipedRight: () => {
       setSwipeDist(0);
     },
-    trackMouse: false,
-    preventScrollOnSwipe: false,
+    onSwiped: () => {
+      setStopScroll(false);
+      setIsSwiping(false);
+    },
+    delta: 0,
   });
 
   const handleDelete = async () => {
@@ -66,6 +77,10 @@ const ShiftItem = ({ wage }: { wage: WageObjectProps }) => {
     setSwipeDist(0);
   }, [wage]);
 
+  useEffect(() => {
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div className="shift-item-container" {...handlers}>
       {loading && (
@@ -76,6 +91,7 @@ const ShiftItem = ({ wage }: { wage: WageObjectProps }) => {
             alignItems: "center",
             position: "absolute",
             top: 0,
+            zIndex: "10",
             width: "100%",
             height: "100%",
             backgroundColor: "rgba(0,0,0,0.48)",
@@ -84,13 +100,21 @@ const ShiftItem = ({ wage }: { wage: WageObjectProps }) => {
           <CircularProgress />
         </Box>
       )}
-      <Box sx={{ display: "flex", alignItems: "center", height: "8.625rem" }}>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          height: "8.625rem",
+          width: "200%",
+          transform: `translateX(-${swipeDist}px)`,
+          transition: isSwiping ? "none" : "transform 0.3s ease",
+        }}
+      >
         <Card
           sx={{
-            width: "100%",
-            marginRight: `${swipeDist}px`,
+            width: "50%",
             transition:
-              "margin-right 0.2s ease, border-top-right-radius 0.2s ease, border-bottom-right-radius 0.2s ease",
+              "border-top-right-radius 0.2s ease, border-bottom-right-radius 0.2s ease",
             borderTopRightRadius: swipeDist > 0 ? "0" : "0.25rem",
             borderBottomRightRadius: swipeDist > 0 ? "0" : "0.25rem",
             height: "100%",
@@ -133,14 +157,10 @@ const ShiftItem = ({ wage }: { wage: WageObjectProps }) => {
         </Card>
         <Box
           sx={{
-            position: "absolute",
-            right: 0,
-            width: `${swipeDist}px`,
-            opacity: swipeDist > 0 ? 1 : 0,
-            transition: "opacity 0.2s ease, width 0.2s ease",
+            width: "50%",
             height: "inherit",
             display: "flex",
-            justifyContent: "center",
+            justifyContent: "flex-start",
             alignItems: "center",
             backgroundColor: "#FF5353",
             borderTopRightRadius: "0.25rem",
@@ -149,13 +169,7 @@ const ShiftItem = ({ wage }: { wage: WageObjectProps }) => {
           }}
         >
           <IconButton onClick={handleDelete}>
-            <Delete
-              fontSize="large"
-              sx={{
-                opacity: swipeDist > 0 ? `calc(${swipeDist / 96})` : 0,
-                transition: "opacity 0.2s ease",
-              }}
-            />
+            <Delete fontSize="large" />
           </IconButton>
         </Box>
       </Box>
