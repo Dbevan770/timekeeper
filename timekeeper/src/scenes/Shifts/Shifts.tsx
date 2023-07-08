@@ -8,6 +8,7 @@ import { useState } from "react";
 
 const Shifts = () => {
   const [loading, setLoading] = useState<boolean>(false);
+  const [stopScroll, setStopScroll] = useState<boolean>(false);
   const { wages } = useWages();
 
   return (
@@ -19,17 +20,25 @@ const Shifts = () => {
             flex: "1 1 auto",
             maxHeight: "calc(100vh - (100dvh * 0.05))",
             overflowY: "auto",
-            p: "0.75rem 0.5rem 0 0",
+            overflowX: "hidden",
+            margin: "0.75rem 0.5rem 0 0",
             display: "flex",
             flexDirection: "column",
             gap: "0.5rem",
+            touchAction: stopScroll ? "none" : "auto",
           }}
         >
           {loading ? (
             <Loading label="Loading data..." />
           ) : wages.length > 0 ? (
             wages.map((wage) => {
-              return <ShiftItem key={wage.docId} wage={wage} />;
+              return (
+                <ShiftItem
+                  key={wage.docId}
+                  wage={wage}
+                  setStopScroll={setStopScroll}
+                />
+              );
             })
           ) : (
             <div>No wages</div>
