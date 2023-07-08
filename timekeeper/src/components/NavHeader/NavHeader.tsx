@@ -28,7 +28,7 @@ const NavHeader = ({
         position: "sticky",
         top: "0",
         left: "0",
-        height: "calc(5% + 1rem)",
+        height: "calc(5dvh + 1rem)",
         zIndex: "1",
         display: "flex",
         justifyContent: "space-between",
