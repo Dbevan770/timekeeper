@@ -18,29 +18,37 @@ const ShiftItem = ({ wage }: { wage: WageObjectProps }) => {
   const [swipeDist, setSwipeDist] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
   const { deleteWage, refreshWages } = useWages();
+
   const handlers = useSwipeable({
     onSwiping: (eventData) => {
       if (!loading) {
-        if (eventData.deltaX < 0) {
-          setSwipeDist(Math.min(Math.abs(eventData.deltaX), 128));
-        } else if (eventData.deltaX > 0 && swipeDist > 0) {
-          setSwipeDist(Math.max(0, swipeDist - eventData.deltaX / 2));
+        let newSwipeDist = swipeDist;
+        if (eventData.dir === "Left") {
+          newSwipeDist = Math.min(
+            swipeDist + Math.abs(eventData.deltaX / 2),
+            128
+          );
+        } else if (eventData.dir === "Right") {
+          newSwipeDist = Math.max(
+            0,
+            swipeDist - Math.abs(eventData.deltaX / 2)
+          );
         }
+        setSwipeDist(newSwipeDist);
       }
     },
-    onSwiped: () => {
-      // If the swipe distance exceeds 50% of the maximum, set it to the maximum
-      if (swipeDist > 96) {
-        setSwipeDist(96);
-      } else if (swipeDist >= 48) {
+    onSwipedLeft: () => {
+      if (swipeDist >= 48) {
         setSwipeDist(96);
       } else {
-        // Otherwise, reset the swipe distance after the swipe is completed
         setSwipeDist(0);
       }
     },
-    trackMouse: true,
-    preventScrollOnSwipe: true,
+    onSwipedRight: () => {
+      setSwipeDist(0);
+    },
+    trackMouse: false,
+    preventScrollOnSwipe: false,
   });
 
   const handleDelete = async () => {
@@ -79,9 +87,10 @@ const ShiftItem = ({ wage }: { wage: WageObjectProps }) => {
       <Box sx={{ display: "flex", alignItems: "center", height: "8.625rem" }}>
         <Card
           sx={{
-            minWidth: swipeDist > 0 ? `calc(100% - ${swipeDist}px)` : "100%",
+            width: "100%",
+            marginRight: `${swipeDist}px`,
             transition:
-              "min-width 0.2s ease, border-top-right-radius 0.2s ease, border-bottom-right-radius 0.2s ease",
+              "margin-right 0.2s ease, border-top-right-radius 0.2s ease, border-bottom-right-radius 0.2s ease",
             borderTopRightRadius: swipeDist > 0 ? "0" : "0.25rem",
             borderBottomRightRadius: swipeDist > 0 ? "0" : "0.25rem",
             height: "100%",
@@ -124,7 +133,9 @@ const ShiftItem = ({ wage }: { wage: WageObjectProps }) => {
         </Card>
         <Box
           sx={{
-            width: swipeDist > 0 ? `${swipeDist}px` : "0",
+            position: "absolute",
+            right: 0,
+            width: `${swipeDist}px`,
             opacity: swipeDist > 0 ? 1 : 0,
             transition: "opacity 0.2s ease, width 0.2s ease",
             height: "inherit",
