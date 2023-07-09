@@ -3,10 +3,11 @@ import { TextField } from "@mui/material";
 interface HourInputProps {
   hour: string;
   setHour: React.Dispatch<React.SetStateAction<string>>;
+  error: boolean;
   disabled: boolean;
 }
 
-const HourInput = ({ hour, setHour, disabled }: HourInputProps) => {
+const HourInput = ({ hour, setHour, error, disabled }: HourInputProps) => {
   const handleHourChange = (
     value: string,
     setter: React.Dispatch<React.SetStateAction<string>>
@@ -32,6 +33,7 @@ const HourInput = ({ hour, setHour, disabled }: HourInputProps) => {
     <TextField
       value={hour}
       onChange={(e) => handleHourChange(e.target.value, setHour)}
+      error={error}
       disabled={disabled}
       variant="outlined"
       label="HH"

@@ -43,6 +43,8 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
   const [breakErrors, setBreakErrors] = useState<{
     [key: number]: { hours: boolean; minutes: boolean };
   }>({});
+  const [startHourError, setStartHourError] = useState<boolean>(false);
+  const [endHourError, setEndHourError] = useState<boolean>(false);
 
   const { themeMode } = useContext(ThemeContext);
   const [loading, setLoading] = useState<boolean>(false);
@@ -110,10 +112,15 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setLoading(true);
 
-    if (startHour === null || startHour === "0") return;
-    if (endHour === null || endHour === "0") return;
+    if (startHour === null || startHour === "0") {
+      setStartHourError(true);
+    }
+    if (endHour === null || endHour === "0") {
+      setEndHourError(true);
+    }
+
+    if (startHourError || endHourError) return;
     if (shiftDate === null) return;
 
     let hasError = false;
@@ -128,10 +135,9 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
         });
       }
     }
-    if (hasError) {
-      setLoading(false);
-      return;
-    }
+    if (hasError) return;
+
+    setLoading(true);
 
     let startHour24 =
       startMeridian === "PM" && parseInt(startHour) < 12
@@ -259,6 +265,7 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
           setMin={setStartMin}
           meridian={startMeridian}
           setMeridian={setStartMeridian}
+          hourError={startHourError}
           disabled={loading}
         />
         <TimeInput
@@ -269,6 +276,7 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
           setMin={setEndMin}
           meridian={endMeridian}
           setMeridian={setEndMeridian}
+          hourError={endHourError}
           disabled={loading}
         />
         <div className="add-remove-breaks-container">
