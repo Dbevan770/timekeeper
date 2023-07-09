@@ -11,6 +11,7 @@ interface TimeInputProps {
   meridian: string;
   setMeridian: React.Dispatch<React.SetStateAction<string>>;
   disabled: boolean;
+  hourError: boolean;
 }
 
 const TimeInput = ({
@@ -22,6 +23,7 @@ const TimeInput = ({
   meridian,
   setMeridian,
   disabled,
+  hourError,
 }: TimeInputProps) => {
   const meridians = [
     {
@@ -39,7 +41,12 @@ const TimeInput = ({
         {label}
       </Typography>
       <div className="time-container">
-        <HourInput hour={hour} setHour={setHour} disabled={disabled} />
+        <HourInput
+          hour={hour}
+          setHour={setHour}
+          disabled={disabled}
+          error={hourError}
+        />
         <Typography variant="h4">:</Typography>
         <MinuteInput minute={min} setMin={setMin} disabled={disabled} />
         <TextField

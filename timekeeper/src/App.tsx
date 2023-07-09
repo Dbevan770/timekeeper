@@ -27,10 +27,7 @@ const App = () => {
       {!loading ? (
         <main className="main-page">
           <Typography variant="h3">TIMEKEEPER</Typography>
-          <Typography
-            variant="subtitle1"
-            sx={{ marginBottom: "1rem", color: "rgba(255,255,255,0.5)" }}
-          >
+          <Typography variant="subtitle1" sx={{ marginBottom: "1rem" }}>
             Never lose track of time again!
           </Typography>
           <Button variant="contained" onClick={handleClick}>

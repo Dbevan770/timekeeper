@@ -117,34 +117,51 @@ const AddShift = () => {
               <WageForm onSubmit={handleSetSubmit} />
             </Box>
           ) : (
-            <div className="earned-wages-container">
+            <Box
+              sx={{
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                p: "3rem",
+              }}
+            >
               <Typography
+                className="congrats-title"
                 variant="h6"
-                sx={{ fontWeight: "300", color: "rgba(255,255,255,0.48)" }}
+                sx={{ fontWeight: "300" }}
               >
                 Congrats, you earned
               </Typography>
-              <Typography variant="h1">
+              <Typography variant="h1" className="total-earned">
                 {currency === "EUR" ? "€" + totalEarned : "$" + totalEarned}
               </Typography>
-              <Typography variant="body1" sx={{ marginBottom: "1.5rem" }}>
+              <Typography
+                className="try-again"
+                variant="body1"
+                sx={{ marginBottom: "1.5rem" }}
+              >
                 Not right?{" "}
                 <Link
                   onClick={handleResetForm}
                   underline="none"
                   color="secondary"
+                  className="try-again"
                 >
                   Try again
                 </Link>
               </Typography>
               <Button
+                className="save-btn"
                 variant="contained"
                 sx={{ width: "100%", fontSize: "1rem" }}
                 onClick={handleSave}
               >
                 Save
               </Button>
-            </div>
+            </Box>
           )}
         </Box>
       ) : (

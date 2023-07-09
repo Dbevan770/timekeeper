@@ -8,18 +8,18 @@ import {
   CircularProgress,
   Backdrop,
 } from "@mui/material";
-import PersonIcon from "@mui/icons-material/Person";
-import EmailIcon from "@mui/icons-material/Email";
-import Visibility from "@mui/icons-material/Visibility";
-import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import { Person, Email, Visibility, VisibilityOff } from "@mui/icons-material";
 import Loading from "../../components/Loading/Loading";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { ThemeContext } from "../../context/ThemeContext";
 import { SignUp } from "../../auth/signup";
 import { useAuthContext } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import "./Register.css";
 
 const Register = () => {
+  const { themeMode } = useContext(ThemeContext);
+
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [pass, setPass] = useState<string>("");
@@ -98,7 +98,7 @@ const Register = () => {
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
-                    <PersonIcon sx={{ color: "rgba(255,255,255,0.23)" }} />
+                    <Person />
                   </InputAdornment>
                 ),
               }}
@@ -115,7 +115,11 @@ const Register = () => {
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
-                    <EmailIcon sx={{ color: "rgba(255,255,255,0.23)" }} />
+                    <Email
+                      sx={{
+                        color: themeMode === "dark" ? "#e1e1e1" : "#000000",
+                      }}
+                    />
                   </InputAdornment>
                 ),
               }}
@@ -140,7 +144,6 @@ const Register = () => {
                       edge="end"
                       sx={{
                         padding: "0 .75rem 0 0",
-                        color: "rgba(255,255,255,0.23)",
                       }}
                     >
                       {showPass ? <VisibilityOff /> : <Visibility />}
@@ -169,7 +172,6 @@ const Register = () => {
                       edge="end"
                       sx={{
                         padding: "0 .75rem 0 0",
-                        color: "rgba(255,255,255,0.23)",
                       }}
                     >
                       {showConfirmPass ? <VisibilityOff /> : <Visibility />}
@@ -193,7 +195,6 @@ const Register = () => {
                 fontSize: ".75rem",
                 padding: "0 1rem",
                 textWrap: "balance",
-                color: "rgba(255,255,255,0.5)",
               }}
             >
               By tapping "Create New Account" you agree to the{" "}
