@@ -20,27 +20,27 @@ const Widget = ({ label, wages, width = "half", content }: WidgetProps) => {
   const { themeMode } = useContext(ThemeContext);
   const [value, setValue] = useState<number>(0);
 
-  const currencyFormatter = (amount: number) => {
-    if (wages && wages.length > 0 && wages[0].currency) {
-      return new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: wages[0].currency,
-      }).format(amount);
-    }
-
-    return "";
-  };
-
-  // decide the number of decimal places based on content
-  const decimalPlaces = () => {
+  const contentFormatter = (content: string, value: number) => {
     switch (content) {
       case "totalEarned":
-        return 2; // currency
-      case "totalHours":
+        return new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: "EUR",
+        }).format(value);
       case "breakTime":
-        return 2; // float
+        let time = "";
+        if (value < 60) {
+          time = value + "m";
+        } else if (value % 60 === 0) {
+          time = Math.floor(value / 60) + "h";
+        } else {
+          time = Math.floor(value / 60) + "h" + (value % 60) + "m";
+        }
+        return time;
+      case "totalHours":
+        return value.toFixed(2);
       default:
-        return 0; // int
+        return value.toFixed(0);
     }
   };
 
@@ -70,9 +70,7 @@ const Widget = ({ label, wages, width = "half", content }: WidgetProps) => {
           {label}
         </Typography>
         <Typography variant="h1" sx={{ textAlign: "left" }}>
-          {content === "totalEarned"
-            ? currencyFormatter(value)
-            : value.toFixed(decimalPlaces())}
+          {contentFormatter(content, value)}
         </Typography>
       </Paper>
     </Box>
