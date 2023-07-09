@@ -39,6 +39,11 @@ interface WageFormProps {
 }
 
 const WageForm = ({ onSubmit }: WageFormProps) => {
+  // Error states
+  const [breakErrors, setBreakErrors] = useState<{
+    [key: number]: { hours: boolean; minutes: boolean };
+  }>({});
+
   const { themeMode } = useContext(ThemeContext);
   const [loading, setLoading] = useState<boolean>(false);
   const [rate, setRate] = useState<string>(
@@ -82,6 +87,13 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
       newBreaks[index] = breakValue;
       return newBreaks;
     });
+
+    setBreakErrors((prevErrors) => {
+      if (!prevErrors[index]) return prevErrors;
+      const newErrors = { ...prevErrors };
+      newErrors[index] = { hours: false, minutes: false };
+      return newErrors;
+    });
   };
 
   const handleAddOrRemoveBreak = (increment: number) => {
@@ -104,6 +116,23 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
     if (endHour === null || endHour === "0") return;
     if (shiftDate === null) return;
 
+    let hasError = false;
+    for (let i = 0; i < breaks.length; i++) {
+      const breakObj = breaks[i];
+      if (!breakObj.hours && !breakObj.minutes) {
+        hasError = true;
+        setBreakErrors((prevErrors) => {
+          let newErrors = { ...prevErrors };
+          newErrors[i] = { hours: true, minutes: true };
+          return newErrors;
+        });
+      }
+    }
+    if (hasError) {
+      setLoading(false);
+      return;
+    }
+
     let startHour24 =
       startMeridian === "PM" && parseInt(startHour) < 12
         ? parseInt(startHour) + 12
@@ -114,7 +143,7 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
         : parseInt(endHour);
 
     if (startMeridian === "AM" && startHour === "12") startHour24 = 0;
-    if (endMeridian === "PM" && endHour === "12") endHour24 = 0;
+    if (endMeridian === "AM" && endHour === "12") endHour24 = 0;
 
     // Convert the hours and minutes to minutes
     const startMinutes = startHour24 * 60 + parseInt(startMin);
@@ -201,12 +230,7 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
-                  <Typography
-                    variant="body2"
-                    sx={{ color: "rgba(255,255,255,0.23)" }}
-                  >
-                    /hr
-                  </Typography>
+                  <Typography variant="body2">/hr</Typography>
                 </InputAdornment>
               ),
             }}
@@ -271,6 +295,7 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
             breakValue={breakValue}
             onChange={handleBreakChange}
             index={index}
+            errors={breakErrors[index]}
             disabled={loading}
             key={index}
           />

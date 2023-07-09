@@ -1,5 +1,4 @@
 import { TextField } from "@mui/material";
-import { useState } from "react";
 import "./BreakInput.css";
 
 interface BreakInputProps {
@@ -9,6 +8,7 @@ interface BreakInputProps {
     index: number,
     breakValue: { hours: string; minutes: string }
   ) => void;
+  errors: { hours: boolean; minutes: boolean };
   disabled: boolean;
 }
 
@@ -16,27 +16,17 @@ const BreakInput = ({
   index,
   breakValue,
   onChange,
+  errors,
   disabled,
 }: BreakInputProps) => {
-  const [currentBreakHours, setCurrentBreakHours] = useState<string>(
-    breakValue.hours || ""
-  );
-  const [currentBreakMinutes, setCurrentBreakMinutes] = useState<string>(
-    breakValue.minutes || ""
-  );
-
   const handleBreakHoursChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!/^\d*$/.test(e.target.value)) return;
-
-    setCurrentBreakHours(e.target.value);
-    onChange(index, { hours: e.target.value, minutes: currentBreakMinutes });
+    onChange(index, { hours: e.target.value, minutes: breakValue.minutes });
   };
 
   const handleBreakMinutesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!/^\d*$/.test(e.target.value)) return;
-
-    setCurrentBreakMinutes(e.target.value);
-    onChange(index, { hours: currentBreakHours, minutes: e.target.value });
+    onChange(index, { hours: breakValue.hours, minutes: e.target.value });
   };
 
   return (
@@ -48,8 +38,8 @@ const BreakInput = ({
         value={breakValue.hours}
         onChange={handleBreakHoursChange}
         disabled={disabled}
+        error={errors?.hours}
         fullWidth
-        required
       ></TextField>
       <TextField
         variant="outlined"
@@ -58,8 +48,8 @@ const BreakInput = ({
         value={breakValue.minutes}
         onChange={handleBreakMinutesChange}
         disabled={disabled}
+        error={errors?.minutes}
         fullWidth
-        required
       ></TextField>
     </div>
   );

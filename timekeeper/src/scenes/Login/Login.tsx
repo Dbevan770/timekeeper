@@ -87,7 +87,7 @@ function Login() {
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
-                    <EmailIcon sx={{ color: "rgba(255,255,255,0.23)" }} />
+                    <EmailIcon />
                   </InputAdornment>
                 ),
               }}

@@ -1,4 +1,4 @@
-import { CircularProgress, Typography } from "@mui/material";
+import { CircularProgress, Typography, Box } from "@mui/material";
 import "./Loading.css";
 
 interface LoadingProps {
@@ -7,10 +7,20 @@ interface LoadingProps {
 
 const Loading = ({ label }: LoadingProps) => {
   return (
-    <div className="loading-container">
+    <Box
+      sx={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        gap: "2rem",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
       <Typography variant="h4">{label}</Typography>
-      <CircularProgress sx={{ color: "#5fff51" }} />
-    </div>
+      <CircularProgress color="primary" />
+    </Box>
   );
 };
 

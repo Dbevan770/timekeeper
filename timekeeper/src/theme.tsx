@@ -221,6 +221,9 @@ const getTheme = (mode: "light" | "dark") => {
             "&.FabIcon": {
               color: mode === "dark" ? "#121212" : "#000000",
             },
+            "&.MuiSelect-icon": {
+              color: mode === "dark" ? "#e1e1e1" : "#000000",
+            },
           },
         },
       },
