@@ -20,10 +20,11 @@ const Shifts = () => {
             maxHeight: "90dvh",
             overflowY: "auto",
             overflowX: "hidden",
-            margin: "0.75rem 0.5rem 0 0",
+            margin: "0.75rem 0 0 0",
             display: "flex",
             flexDirection: "column",
             gap: "0.5rem",
+            paddingRight: "0.75rem",
           }}
         >
           {loading ? (

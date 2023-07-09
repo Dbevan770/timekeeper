@@ -10,7 +10,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { Delete } from "@mui/icons-material";
-import { useCallback, useState, useEffect } from "react";
+import { useCallback, useState, useEffect, useRef } from "react";
 import { useSwipeable } from "react-swipeable";
 import { useWages } from "../../context/WagesContext";
 
@@ -20,12 +20,14 @@ interface ShiftItemProps {
 
 const ShiftItem = ({ wage }: ShiftItemProps) => {
   const [swipeDist, setSwipeDist] = useState(0);
-  const [startDeltaX, setStartDeltaX] = useState(0);
+  const [maxSwipeDist, setMaxSwipeDist] = useState(0);
+  const [deletionTrigger, setDeletionTrigger] = useState(0);
   const [isSwiping, setIsSwiping] = useState<boolean>(false);
-  const [offsetApplied, setOffsetApplied] = useState(false);
   const [loading, setLoading] = useState(false);
   const [deletionTriggered, setDeletionTriggered] = useState(false);
   const { deleteWage, refreshWages } = useWages();
+  const swipeOffset = useRef(0);
+  const swipableRef = useRef<HTMLDivElement | null>(null);
 
   const handleDelete = useCallback(async () => {
     setLoading(true);
@@ -37,29 +39,20 @@ const ShiftItem = ({ wage }: ShiftItemProps) => {
   const handlers = useSwipeable({
     onSwipeStart: () => {
       setIsSwiping(true);
-      setOffsetApplied(false);
+      swipeOffset.current = swipeDist;
     },
     onSwiping: (eventData) => {
       let currentSwipeDist = swipeDist;
-      if (eventData.dir === "Left") {
-        currentSwipeDist = Math.min(Math.abs(eventData.deltaX), 250);
-        setSwipeDist(currentSwipeDist);
-      } else if (eventData.dir === "Right") {
-        if (swipeDist === 51 && !startDeltaX) {
-          setStartDeltaX(eventData.deltaX);
-        }
-
-        const actualDelta = Math.abs(eventData.deltaX - startDeltaX);
-        currentSwipeDist = Math.max(0, 51 - actualDelta);
-        if (!offsetApplied) {
-          currentSwipeDist += 10;
-          setOffsetApplied(true);
-        }
+      if (!loading) {
+        currentSwipeDist = Math.min(
+          Math.max(0, swipeOffset.current - eventData.deltaX + 10),
+          maxSwipeDist
+        );
         setSwipeDist(currentSwipeDist);
       }
     },
     onSwiped: (eventData) => {
-      if (eventData.dir === "Left" && swipeDist > 183) {
+      if (eventData.dir === "Left" && swipeDist > deletionTrigger) {
         setDeletionTriggered(true);
       } else if (swipeDist > 51) {
         setSwipeDist(51);
@@ -67,16 +60,15 @@ const ShiftItem = ({ wage }: ShiftItemProps) => {
         setSwipeDist(0);
       }
       setIsSwiping(false);
-      setStartDeltaX(0);
     },
-    delta: { up: 250, down: 250, left: 10, right: 0 },
+    delta: { up: 250, down: 250, left: 10, right: 10 },
     preventScrollOnSwipe: true,
   });
 
   useEffect(() => {
     let deletionTimeout: ReturnType<typeof setTimeout>;
     if (deletionTriggered) {
-      setSwipeDist(366);
+      setSwipeDist(maxSwipeDist);
 
       deletionTimeout = setTimeout(() => {
         handleDelete();
@@ -87,6 +79,14 @@ const ShiftItem = ({ wage }: ShiftItemProps) => {
       clearTimeout(deletionTimeout);
     };
   }, [deletionTriggered]);
+
+  useEffect(() => {
+    if (swipableRef.current) {
+      const width = swipableRef.current.offsetWidth;
+      setMaxSwipeDist(width / 2);
+      setDeletionTrigger(width / 4);
+    }
+  }, []);
 
   return (
     <Box
@@ -116,14 +116,15 @@ const ShiftItem = ({ wage }: ShiftItemProps) => {
             <CircularProgress />
           </Box>
         )}
-        <Box
-          sx={{
+        <div
+          ref={swipableRef}
+          style={{
             display: "flex",
             alignItems: "center",
             height: "8.625rem",
             width: "200%",
             transform: `translateX(-${swipeDist}px)`,
-            transition: isSwiping ? "none" : `transform 0.3s ease`,
+            transition: isSwiping ? "none" : "transform 0.3s ease",
             borderRadius: "0.25rem",
             overflow: "hidden",
           }}
@@ -156,9 +157,10 @@ const ShiftItem = ({ wage }: ShiftItemProps) => {
                     .toLocaleDateString("en-us", { weekday: "long" })}
               </Typography>
               <Typography variant="h1" sx={{ fontWeight: "400" }}>
-                {wage.currency === "EUR"
-                  ? wage.totalEarned.toFixed(2) + "€"
-                  : "$" + wage.totalEarned.toFixed(2)}
+                {Intl.NumberFormat("en-US", {
+                  style: "currency",
+                  currency: wage.currency,
+                }).format(wage.totalEarned)}
               </Typography>
               <div className="chip-container">
                 <Chip
@@ -183,7 +185,7 @@ const ShiftItem = ({ wage }: ShiftItemProps) => {
               <Delete fontSize="large" />
             </IconButton>
           </Box>
-        </Box>
+        </div>
       </div>
     </Box>
   );
