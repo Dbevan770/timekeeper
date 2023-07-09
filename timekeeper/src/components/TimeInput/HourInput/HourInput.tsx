@@ -16,7 +16,7 @@ const HourInput = ({ hour, setHour, disabled }: HourInputProps) => {
     if (isNaN(intValue)) {
       setter("");
       return;
-    } else if (intValue > 12 || intValue < 1 || value.length > 2) {
+    } else if (intValue > 12 || intValue < 0 || value.length > 2) {
       return;
     } else {
       if (value.length === 2 && value[1] === "0" && value[0] !== "1") {
