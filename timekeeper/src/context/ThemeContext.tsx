@@ -9,8 +9,8 @@ type ThemeContextType = {
 };
 
 export const ThemeContext = createContext<ThemeContextType>({
-  theme: getTheme("light"),
-  themeMode: "light",
+  theme: getTheme("dark"),
+  themeMode: "dark",
   switchThemeMode: () => {},
 });
 
@@ -20,7 +20,7 @@ type ThemeProviderProps = {
 
 export const ThemeProvider = ({ children }: ThemeProviderProps) => {
   const [themeMode, setThemeMode] = useState<"light" | "dark">(
-    (localStorage.getItem("themeMode") as "light" | "dark") || "light"
+    (localStorage.getItem("themeMode") as "light" | "dark") || "dark"
   );
 
   useEffect(() => {
