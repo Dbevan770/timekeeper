@@ -64,9 +64,9 @@ const SettingsPage = () => {
           <Box sx={{ height: "calc(100% - (5% + 1rem))", mt: "0.5rem" }}>
             <List>
               <ListItem>
-                <ListItemText primary="Dark Mode" />
+                <ListItemText primary="Light Mode(BETA)" />
                 <Switch
-                  checked={themeMode === "dark"}
+                  checked={themeMode === "light"}
                   onChange={() => switchThemeMode()}
                 />
               </ListItem>
