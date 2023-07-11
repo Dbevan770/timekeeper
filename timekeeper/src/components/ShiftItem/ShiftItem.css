@@ -1,11 +1,4 @@
 .shift-item-container {
   width: 100%;
-  min-height: 8.625rem;
-  position: relative;
-}
-
-.chip-container {
-  display: flex;
-  justify-content: left;
-  align-items: center;
+  height: 100%;
 }

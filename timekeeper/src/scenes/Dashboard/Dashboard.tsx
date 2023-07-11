@@ -1,7 +1,7 @@
 import { useAuthContext } from "../../context/AuthContext";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Typography, Button, Fab, Box } from "@mui/material";
+import { Typography, Button, Fab, Box, Grid } from "@mui/material";
 import { Add, Home } from "@mui/icons-material";
 import { useWages } from "../../context/WagesContext";
 import Loading from "../../components/Loading/Loading";
@@ -50,6 +50,7 @@ const Dashboard = () => {
                 <Box
                   sx={{
                     mt: "0.75rem",
+                    mb: "0.75rem",
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
@@ -61,14 +62,7 @@ const Dashboard = () => {
                   </Typography>
                   <Typography variant="body1">&lt; 7days</Typography>
                 </Box>
-                <Box
-                  sx={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(2, 1fr)",
-                    gap: "0.5rem",
-                    marginTop: "0.5rem",
-                  }}
-                >
+                <Grid zeroMinWidth container spacing={1}>
                   <Widget
                     label="Total Earnings"
                     width="full"
@@ -100,7 +94,7 @@ const Dashboard = () => {
                     content="breakTime"
                     contentType="float"
                   />
-                </Box>
+                </Grid>
               </>
             ) : (
               <div className="empty-content">

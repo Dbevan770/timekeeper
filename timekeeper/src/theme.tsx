@@ -45,6 +45,9 @@ const getTheme = (mode: "light" | "dark") => {
                 mode === "dark" ? "rgba(255,255,255,0.48)" : "rgba(0,0,0,0.48)",
               textAlign: "left",
             },
+            "&.EmailVerifyBody": {
+              color: "#c22727",
+            },
           },
           overline: {
             "&.MuiTypography-overline": {

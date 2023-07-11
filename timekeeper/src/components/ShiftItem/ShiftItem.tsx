@@ -8,8 +8,10 @@ import {
   Box,
   IconButton,
   CircularProgress,
+  Grid,
+  Button,
 } from "@mui/material";
-import { Delete } from "@mui/icons-material";
+import { Delete, Add } from "@mui/icons-material";
 import { useCallback, useState, useEffect, useRef, useContext } from "react";
 import { ThemeContext } from "../../context/ThemeContext";
 import { useSwipeable } from "react-swipeable";
@@ -127,7 +129,7 @@ const ShiftItem = ({ wage }: ShiftItemProps) => {
           style={{
             display: "flex",
             alignItems: "center",
-            height: "8.625rem",
+            height: "100%",
             width: "200%",
             transform: `translateX(-${swipeDist}px)`,
             transition: isSwiping ? "none" : "transform 0.3s ease",
@@ -143,6 +145,9 @@ const ShiftItem = ({ wage }: ShiftItemProps) => {
           >
             <CardContent
               sx={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
                 minWidth: "100%",
                 height: "100%",
                 p: "1rem 1rem 0.5rem 1rem",
@@ -167,19 +172,34 @@ const ShiftItem = ({ wage }: ShiftItemProps) => {
                   currency: wage.currency,
                 }).format(wage.totalEarned)}
               </Typography>
-              <div className="chip-container">
-                <Chip
-                  size="small"
-                  label={"Total Hours: " + wage.totalHours.toFixed(2)}
-                  color="primary"
-                />
-              </div>
+              <Grid container justifyContent="flex-start" spacing={1}>
+                <Grid item xs>
+                  <Chip
+                    size="small"
+                    label={"Tot. Hrs: " + wage.totalHours.toFixed(2)}
+                    color="primary"
+                    onDelete={() => console.log("I've been deleted :(")}
+                  />
+                </Grid>
+                <Grid item xs>
+                  <Button
+                    variant="outlined"
+                    sx={{
+                      width: "32px",
+                      p: "0",
+                      borderRadius: "16px",
+                    }}
+                  >
+                    <Add sx={{ fontSize: "1.25rem" }} />
+                  </Button>
+                </Grid>
+              </Grid>
             </CardContent>
           </Card>
           <Box
             sx={{
               width: "50%",
-              height: "inherit",
+              height: "100%",
               display: "flex",
               justifyContent: "flex-start",
               alignItems: "center",

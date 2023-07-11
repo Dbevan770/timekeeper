@@ -8,6 +8,7 @@ import { WagesProvider } from "./context/WagesContext.tsx";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./index.css";
 import Register from "./scenes/Register/Register.tsx";
+import Account from "./scenes/Account/Account.tsx";
 import Login from "./scenes/Login/Login.tsx";
 import Dashboard from "./scenes/Dashboard/Dashboard.tsx";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute.tsx";
@@ -36,6 +37,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
                     element={<Success />}
                   />
                   <Route path="/shifts" element={<Shifts />} />
+                  <Route path="/account" element={<Account />} />
                   <Route path="/settings" element={<SettingsPage />} />
                 </Route>
                 <Route path="*" element={<ErrorPage />} />

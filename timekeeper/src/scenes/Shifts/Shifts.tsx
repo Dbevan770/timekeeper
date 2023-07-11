@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import { AccessTime } from "@mui/icons-material";
 import NavHeader from "../../components/NavHeader/NavHeader";
 import ShiftItem from "../../components/ShiftItem/ShiftItem";
@@ -8,7 +8,7 @@ import { useState } from "react";
 
 const Shifts = () => {
   const [loading, setLoading] = useState<boolean>(false);
-  const { wages } = useWages();
+  const { wages, isLoadingWages } = useWages();
 
   return (
     <Box sx={{ width: "100%", height: "100dvh", p: "0.5rem" }}>
@@ -21,20 +21,26 @@ const Shifts = () => {
             overflowY: "auto",
             overflowX: "hidden",
             margin: "0.75rem 0 0 0",
-            display: "flex",
-            flexDirection: "column",
-            gap: "0.5rem",
             paddingRight: "0.75rem",
           }}
         >
           {loading ? (
             <Loading label="Loading data..." />
-          ) : wages.length > 0 ? (
-            wages.map((wage) => {
-              return <ShiftItem key={wage.docId} wage={wage} />;
-            })
+          ) : !isLoadingWages ? (
+            wages.length > 0 ? (
+              <Stack
+                spacing={1.5}
+                sx={{ paddingBottom: "0.5rem", height: "100%" }}
+              >
+                {wages.map((wage) => {
+                  return <ShiftItem key={wage.docId} wage={wage} />;
+                })}
+              </Stack>
+            ) : (
+              <div>No wages</div>
+            )
           ) : (
-            <div>No wages</div>
+            <Loading label="Loading data..." />
           )}
         </Box>
       </Box>
