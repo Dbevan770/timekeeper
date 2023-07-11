@@ -30,7 +30,7 @@ const Shifts = () => {
             wages.length > 0 ? (
               <Stack
                 spacing={1.5}
-                sx={{ paddingBottom: "0.5rem", height: "100%" }}
+                sx={{ paddingBottom: "0.5rem", alignItems: "stretch" }}
               >
                 {wages.map((wage) => {
                   return <ShiftItem key={wage.docId} wage={wage} />;

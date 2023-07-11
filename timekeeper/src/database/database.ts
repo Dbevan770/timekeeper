@@ -6,6 +6,10 @@ import {
   doc,
   deleteDoc,
   Timestamp as FirebaseTimestamp,
+  query,
+  where,
+  Query,
+  DocumentData,
 } from "firebase/firestore";
 import { User as FirebaseUser } from "firebase/auth";
 
@@ -67,6 +71,71 @@ export interface WageObjectProps {
   totalEarned: number;
   currency: string;
 }
+
+export interface DateRangeQuery {
+  queryType:
+    | "currentWeek"
+    | "pastWeek"
+    | "pastMonth"
+    | "pastSixMonths"
+    | "custom";
+  startDate?: Date;
+  endDate?: Date;
+}
+
+export const GetFilteredWages = async (
+  user: FirebaseUser,
+  dateRangeQuery: DateRangeQuery
+): Promise<WageObjectProps[]> => {
+  if (user === null) return [];
+  let wages: WageObjectProps[] = [];
+
+  const userWagesRef = collection(FIREBASE_DB, user.uid);
+  let q: Query<DocumentData>;
+
+  switch (dateRangeQuery.queryType) {
+    case "currentWeek":
+      let current = new Date();
+      let first = current.getDate() - current.getDay();
+      let last = first + 6;
+      let firstDate = new Date(
+        current.getFullYear(),
+        current.getMonth(),
+        first
+      );
+      let lastDate = new Date(current.getFullYear(), current.getMonth(), last);
+
+      q = query(
+        userWagesRef,
+        where("shiftDate", ">=", firstDate),
+        where("shiftDate", "<=", lastDate)
+      );
+      break;
+    default:
+      throw new Error(
+        `Invalid queryType passed to database: ${dateRangeQuery.queryType}`
+      );
+  }
+
+  const querySnapshot = await getDocs(q);
+  querySnapshot.forEach((doc) => {
+    const data = doc.data();
+    wages.push({
+      docId: doc.id,
+      totalHours: data.totalHours,
+      shiftDate: data.shiftDate,
+      startTime: data.startTime,
+      endTime: data.endTime,
+      breaks: data.breaks,
+      breakTime: data.breakTime,
+      rate: data.rate,
+      totalEarned: data.totalEarned,
+      currency: data.currency,
+    });
+  });
+
+  return wages;
+};
 
 export const GetWages = async (
   user: FirebaseUser

@@ -14,6 +14,18 @@ const Dashboard = () => {
   const { wages, isLoadingWages } = useWages();
   const { user } = useAuthContext();
   const navigate = useNavigate();
+  let current = new Date();
+  let first = current.getDate() - current.getDay();
+  let last = first + 6;
+
+  let firstDate = new Date(current.setDate(first)).toLocaleString("en-US", {
+    day: "numeric",
+    month: "short",
+  });
+  let lastDate = new Date(current.setDate(last)).toLocaleString("en-US", {
+    day: "numeric",
+    month: "short",
+  });
 
   const handleClick = () => {
     navigate("/dashboard/add-wages");
@@ -60,9 +72,11 @@ const Dashboard = () => {
                   <Typography variant="h4">
                     Hello {user?.displayName}!
                   </Typography>
-                  <Typography variant="body1">&lt; 7days</Typography>
+                  <Typography variant="body1">
+                    {firstDate + " - " + lastDate}
+                  </Typography>
                 </Box>
-                <Grid zeroMinWidth container spacing={1}>
+                <Grid container spacing={1}>
                   <Widget
                     label="Total Earnings"
                     width="full"

@@ -1,4 +1,3 @@
-import "./ShiftItem.css";
 import { WageObjectProps } from "../../database/database";
 import {
   Card,
@@ -8,8 +7,8 @@ import {
   Box,
   IconButton,
   CircularProgress,
-  Grid,
   Button,
+  Stack,
 } from "@mui/material";
 import { Delete, Add } from "@mui/icons-material";
 import { useCallback, useState, useEffect, useRef, useContext } from "react";
@@ -99,14 +98,22 @@ const ShiftItem = ({ wage }: ShiftItemProps) => {
         borderRadius: "0.25rem",
         overflow: "hidden",
         width: "100%",
-        minHeight: "8.625rem",
+        height: "auto",
         position: "relative",
         border: themeMode === "dark" ? "none" : "1px solid rgba(0,0,0,0.48)",
         boxShadow:
           themeMode === "dark" ? "none" : "10px 5px 5px rgba(0,0,0,0.6)",
       }}
     >
-      <div className="shift-item-container" {...handlers}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "stretch",
+          position: "relative",
+        }}
+        {...handlers}
+      >
         {loading && (
           <Box
             sx={{
@@ -128,7 +135,6 @@ const ShiftItem = ({ wage }: ShiftItemProps) => {
           ref={swipableRef}
           style={{
             display: "flex",
-            alignItems: "center",
             height: "100%",
             width: "200%",
             transform: `translateX(-${swipeDist}px)`,
@@ -137,81 +143,96 @@ const ShiftItem = ({ wage }: ShiftItemProps) => {
             overflow: "hidden",
           }}
         >
-          <Card
-            sx={{
-              width: "50%",
-              height: "100%",
-            }}
-          >
-            <CardContent
+          <div style={{ display: "flex", width: "100%" }}>
+            <Card
               sx={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between",
-                minWidth: "100%",
+                width: "50%",
                 height: "100%",
-                p: "1rem 1rem 0.5rem 1rem",
               }}
             >
-              <Typography
-                variant="body1"
+              <CardContent
                 sx={{
-                  textAlign: "left",
-                  fontSize: ".875rem",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  minWidth: "100%",
+                  minHeight: "4.5rem",
+                  p: "1rem 1rem 0.5rem 1rem",
                 }}
               >
-                {wage.shiftDate.toDate().toLocaleDateString() +
-                  " - " +
-                  wage.shiftDate
-                    .toDate()
-                    .toLocaleDateString("en-us", { weekday: "long" })}
-              </Typography>
-              <Typography variant="h1" sx={{ fontWeight: "400" }}>
-                {Intl.NumberFormat("en-US", {
-                  style: "currency",
-                  currency: wage.currency,
-                }).format(wage.totalEarned)}
-              </Typography>
-              <Grid container justifyContent="flex-start" spacing={1}>
-                <Grid item xs>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    textAlign: "left",
+                    fontSize: ".875rem",
+                  }}
+                >
+                  {wage.shiftDate.toDate().toLocaleDateString() +
+                    " - " +
+                    wage.shiftDate
+                      .toDate()
+                      .toLocaleDateString("en-us", { weekday: "long" })}
+                </Typography>
+                <Typography variant="h1" sx={{ fontWeight: "400" }}>
+                  {Intl.NumberFormat("en-US", {
+                    style: "currency",
+                    currency: wage.currency,
+                  }).format(wage.totalEarned)}
+                </Typography>
+                <Stack direction="row" spacing={1} flexWrap="wrap">
                   <Chip
                     size="small"
                     label={"Tot. Hrs: " + wage.totalHours.toFixed(2)}
                     color="primary"
                     onDelete={() => console.log("I've been deleted :(")}
                   />
-                </Grid>
-                <Grid item xs>
+                  <Chip
+                    size="small"
+                    label={"Tot. Hrs: " + wage.totalHours.toFixed(2)}
+                    color="primary"
+                    onDelete={() => console.log("I've been deleted :(")}
+                  />
+                  <Chip
+                    size="small"
+                    label={"Tot. Hrs: " + wage.totalHours.toFixed(2)}
+                    color="primary"
+                    onDelete={() => console.log("I've been deleted :(")}
+                  />
+                  <Chip
+                    size="small"
+                    label={"Tot. Hrs: " + wage.totalHours.toFixed(2)}
+                    color="primary"
+                    onDelete={() => console.log("I've been deleted :(")}
+                  />
                   <Button
                     variant="outlined"
                     sx={{
-                      width: "32px",
                       p: "0",
                       borderRadius: "16px",
                     }}
                   >
                     <Add sx={{ fontSize: "1.25rem" }} />
                   </Button>
-                </Grid>
-              </Grid>
-            </CardContent>
-          </Card>
-          <Box
-            sx={{
-              width: "50%",
-              height: "100%",
-              display: "flex",
-              justifyContent: "flex-start",
-              alignItems: "center",
-              backgroundColor: "#FF5353",
-            }}
-          >
-            <IconButton onClick={handleDelete}>
-              <Delete fontSize="large" />
-            </IconButton>
-          </Box>
+                </Stack>
+              </CardContent>
+            </Card>
+            <Box
+              sx={{
+                width: "50%",
+                height: "100%",
+                display: "flex",
+                justifyContent: "flex-start",
+                alignItems: "center",
+                backgroundColor: "#FF5353",
+              }}
+            >
+              <IconButton onClick={handleDelete}>
+                <Delete fontSize="large" />
+              </IconButton>
+            </Box>
+          </div>
         </div>
-      </div>
+      </Box>
     </Box>
   );
 };

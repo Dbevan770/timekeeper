@@ -7,9 +7,10 @@ import {
   ReactNode,
 } from "react";
 import {
-  GetWages,
+  GetFilteredWages,
   WageObjectProps,
   CreateWageProps,
+  DateRangeQuery,
   CreateWage,
   DeleteWage,
 } from "../database/database";
@@ -36,6 +37,9 @@ export const useWages = (): WagesContextType => {
 export const WagesProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useAuthContext();
   const [isLoadingWages, setIsLoadingWages] = useState<boolean>(false);
+  const [dateRangeQuery, setDateRangeQuery] = useState<DateRangeQuery>({
+    queryType: "currentWeek",
+  });
   const [wages, setWages] = useState<WageObjectProps[]>([]);
 
   const getWages = useCallback(async () => {
@@ -43,12 +47,7 @@ export const WagesProvider = ({ children }: { children: ReactNode }) => {
     let result: WageObjectProps[] = [];
 
     if (user) {
-      result = await GetWages(user);
-
-      const now = Date.now();
-      const oneWeekAgo = now - 7 * 24 * 60 * 60 * 1000;
-
-      result = result.filter((wage) => wage.shiftDate.toMillis() >= oneWeekAgo);
+      result = await GetFilteredWages(user, dateRangeQuery);
 
       // Sort the result array by shiftDate in descending order
       result.sort((a, b) => b.shiftDate.toMillis() - a.shiftDate.toMillis());
@@ -56,7 +55,7 @@ export const WagesProvider = ({ children }: { children: ReactNode }) => {
 
     setWages(result);
     setIsLoadingWages(false);
-  }, [user]);
+  }, [user, dateRangeQuery]);
 
   useEffect(() => {
     getWages();
@@ -90,12 +89,17 @@ export const WagesProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const setDateRange = (newDateRangeQuery: DateRangeQuery) => {
+    setDateRangeQuery(newDateRangeQuery);
+  };
+
   const value = {
     wages,
     isLoadingWages,
     refreshWages: getWages,
     addWage,
     deleteWage,
+    setDateRange,
   };
 
   return (
