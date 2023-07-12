@@ -1,4 +1,4 @@
-import { Typography, TextField, MenuItem } from "@mui/material";
+import { Typography, TextField, MenuItem, Stack } from "@mui/material";
 import HourInput from "./HourInput/HourInput";
 import MinuteInput from "./MinuteInput/MinuteInput";
 
@@ -6,6 +6,7 @@ interface TimeInputProps {
   label: string;
   hour: string;
   setHour: React.Dispatch<React.SetStateAction<string>>;
+  setHourError: React.Dispatch<React.SetStateAction<boolean>>;
   min: string;
   setMin: React.Dispatch<React.SetStateAction<string>>;
   meridian: string;
@@ -18,6 +19,7 @@ const TimeInput = ({
   label,
   hour,
   setHour,
+  setHourError,
   min,
   setMin,
   meridian,
@@ -40,10 +42,16 @@ const TimeInput = ({
       <Typography variant="subtitle1" sx={{ fontSize: ".75rem" }}>
         {label}
       </Typography>
-      <div className="time-container">
+      <Stack
+        direction="row"
+        spacing={0.5}
+        alignItems="center"
+        justifyContent="center"
+      >
         <HourInput
           hour={hour}
           setHour={setHour}
+          setHourError={setHourError}
           disabled={disabled}
           error={hourError}
         />
@@ -65,7 +73,7 @@ const TimeInput = ({
             </MenuItem>
           ))}
         </TextField>
-      </div>
+      </Stack>
     </>
   );
 };

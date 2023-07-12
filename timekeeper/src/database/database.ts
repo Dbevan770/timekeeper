@@ -111,6 +111,14 @@ export const GetFilteredWages = async (
         where("shiftDate", "<=", lastDate)
       );
       break;
+    case "pastWeek":
+      break;
+    case "pastMonth":
+      break;
+    case "pastSixMonths":
+      break;
+    case "custom":
+      break;
     default:
       throw new Error(
         `Invalid queryType passed to database: ${dateRangeQuery.queryType}`

@@ -5,12 +5,14 @@ import { Typography, Button, Fab, Box, Grid } from "@mui/material";
 import { Add, Home } from "@mui/icons-material";
 import { useWages } from "../../context/WagesContext";
 import Loading from "../../components/Loading/Loading";
+import DataFilterModal from "../../components/DataFilterModal/DataFilterModal";
 import "./Dashboard.css";
 import NavHeader from "../../components/NavHeader/NavHeader";
 import Widget from "../../components/Widget/Widget";
 
 const Dashboard = () => {
   const [loading, setLoading] = useState<boolean>(false);
+  const [openDataFilter, setOpenDataFiler] = useState<boolean>(false);
   const { wages, isLoadingWages } = useWages();
   const { user } = useAuthContext();
   const navigate = useNavigate();
@@ -72,9 +74,15 @@ const Dashboard = () => {
                   <Typography variant="h4">
                     Hello {user?.displayName}!
                   </Typography>
-                  <Typography variant="body1">
+                  <Button
+                    color="secondary"
+                    variant="contained"
+                    sx={{ position: "relative" }}
+                    onClick={() => setOpenDataFiler(!openDataFilter)}
+                  >
                     {firstDate + " - " + lastDate}
-                  </Typography>
+                  </Button>
+                  {openDataFilter && <DataFilterModal />}
                 </Box>
                 <Grid container spacing={1}>
                   <Widget

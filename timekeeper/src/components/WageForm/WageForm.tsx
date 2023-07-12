@@ -7,15 +7,22 @@ import {
   Backdrop,
   CircularProgress,
   Box,
+  Stack,
+  Snackbar,
+  SnackbarCloseReason,
+  Alert,
 } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
-import RemoveIcon from "@mui/icons-material/Remove";
+import { Add, Remove } from "@mui/icons-material";
 import { ThemeContext } from "../../context/ThemeContext";
-import { LocalizationProvider } from "@mui/x-date-pickers";
+import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Dayjs } from "dayjs";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { useState, useContext } from "react";
+import { useState, useContext, SyntheticEvent } from "react";
+import {
+  calculateTimeDifference,
+  calculateTotalBreaks,
+  calculateEarned,
+} from "../../utils/calcHelper";
 import "./WageForm.css";
 import BreakInput from "../BreakInput/BreakInput";
 import TimeInput from "../TimeInput/TimeInput";
@@ -39,6 +46,9 @@ interface WageFormProps {
 }
 
 const WageForm = ({ onSubmit }: WageFormProps) => {
+  const [open, setOpen] = useState<boolean>(false);
+  const [message, setMessage] = useState<string>("");
+
   // Error states
   const [breakErrors, setBreakErrors] = useState<{
     [key: number]: { hours: boolean; minutes: boolean };
@@ -80,6 +90,22 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
     },
   ];
 
+  const openSnackbar = (message: string) => {
+    setMessage(message);
+    setOpen(true);
+  };
+
+  const closeErrorSnackbar = (
+    _?: SyntheticEvent | Event,
+    reason?: SnackbarCloseReason
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpen(false);
+  };
+
   const handleBreakChange = (
     index: number,
     breakValue: { hours: string; minutes: string }
@@ -115,13 +141,18 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
 
     if (startHour === null || startHour === "0") {
       setStartHourError(true);
+      openSnackbar("Start hour cannot be 0.");
+      return;
     }
     if (endHour === null || endHour === "0") {
       setEndHourError(true);
+      openSnackbar("End hour cannot be 0.");
+      return;
     }
 
-    if (startHourError || endHourError) return;
-    if (shiftDate === null) return;
+    if (shiftDate === null) {
+      openSnackbar("Shift date cannot be empty.");
+    }
 
     let hasError = false;
     for (let i = 0; i < breaks.length; i++) {
@@ -135,63 +166,45 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
         });
       }
     }
-    if (hasError) return;
+    if (hasError) {
+      openSnackbar("Breaks must include either the hours or minutes or both.");
+      return;
+    }
 
     setLoading(true);
 
-    let startHour24 =
-      startMeridian === "PM" && parseInt(startHour) < 12
-        ? parseInt(startHour) + 12
-        : parseInt(startHour);
-    let endHour24 =
-      endMeridian === "PM" && parseInt(endHour) < 12
-        ? parseInt(endHour) + 12
-        : parseInt(endHour);
+    const totalHoursWorked = calculateTimeDifference(
+      startHour,
+      startMin,
+      startMeridian,
+      endHour,
+      endMin,
+      endMeridian
+    );
+    const totalBreaks = calculateTotalBreaks(breaks);
+    const actualHoursWorked = totalHoursWorked - totalBreaks;
+    const earned = calculateEarned(actualHoursWorked, rate);
 
-    if (startMeridian === "AM" && startHour === "12") startHour24 = 0;
-    if (endMeridian === "AM" && endHour === "12") endHour24 = 0;
-
-    // Convert the hours and minutes to minutes
-    const startMinutes = startHour24 * 60 + parseInt(startMin);
-    const endMinutes = endHour24 * 60 + parseInt(endMin);
-
-    // Calculate the difference in minutes
-    let diffMinutes = endMinutes - startMinutes;
-
-    // If the end time is less than the start time, add 24 hours (in minutes)
-    if (diffMinutes < 0) {
-      diffMinutes += 24 * 60;
-    }
-
-    // Convert the difference to hours
-    const diffHours = diffMinutes / 60;
-
-    const totalBreaks = breaks.reduce((total, breakObj) => {
-      const breakHours = parseInt(breakObj.hours) || 0;
-      const breakMinutes = parseInt(breakObj.minutes) || 0;
-      const breakInHours = breakHours + breakMinutes / 60;
-      return total + breakInHours;
-    }, 0);
-
-    const actualHoursWorked = diffHours - totalBreaks;
-
-    const earned = (actualHoursWorked * parseFloat(rate)).toFixed(2);
+    // Padding the hours and minutes to avoid single digit times in the DB
+    const paddedStartHour = startHour.padStart(2, "0");
+    const paddedStartMin = startMin.padStart(2, "0");
+    const paddedEndHour = endHour.padStart(2, "0");
+    const paddedEndMin = endMin.padStart(2, "0");
 
     onSubmit(
       actualHoursWorked,
       shiftDate,
       rate,
       currency,
-      startHour,
-      startMin,
+      paddedStartHour,
+      paddedStartMin,
       startMeridian,
-      endHour,
-      endMin,
+      paddedEndHour,
+      paddedEndMin,
       endMeridian,
       earned,
       breaks
     );
-    setLoading(false);
   };
 
   return (
@@ -203,11 +216,29 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
         p: "0.75rem 2.5rem 0.75rem 2.5rem",
       }}
     >
-      <form id="add-wages-form" onSubmit={handleSubmit}>
+      <Snackbar
+        open={open}
+        autoHideDuration={6000}
+        onClose={closeErrorSnackbar}
+      >
+        <Alert
+          onClose={closeErrorSnackbar}
+          severity="error"
+          sx={{ width: "100%" }}
+          variant="filled"
+        >
+          {message}
+        </Alert>
+      </Snackbar>
+      <form
+        id="add-wages-form"
+        onSubmit={handleSubmit}
+        style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}
+      >
         <Backdrop open={loading} sx={{ color: "#fff", zIndex: 1 }}>
           <CircularProgress color="primary" />
         </Backdrop>
-        <div className="currency-rate">
+        <Stack spacing={0.75} direction="row">
           <TextField
             id="select-currency"
             value={currency}
@@ -246,7 +277,7 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
               },
             }}
           ></TextField>
-        </div>
+        </Stack>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DatePicker
             label="Date of Shift"
@@ -261,6 +292,7 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
           label="Start Time"
           hour={startHour}
           setHour={setStartHour}
+          setHourError={setStartHourError}
           min={startMin}
           setMin={setStartMin}
           meridian={startMeridian}
@@ -272,6 +304,7 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
           label="End Time"
           hour={endHour}
           setHour={setEndHour}
+          setHourError={setEndHourError}
           min={endMin}
           setMin={setEndMin}
           meridian={endMeridian}
@@ -279,25 +312,29 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
           hourError={endHourError}
           disabled={loading}
         />
-        <div className="add-remove-breaks-container">
-          <div className="add-remove-btns">
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          sx={{ mt: "1rem" }}
+        >
+          <Stack direction="row" spacing={0.5}>
             <Button
               variant="outlined"
               onClick={() => handleAddOrRemoveBreak(-1)}
               disabled={loading}
             >
-              <RemoveIcon />
+              <Remove />
             </Button>
             <Button
               variant="outlined"
               onClick={() => handleAddOrRemoveBreak(1)}
               disabled={loading}
             >
-              <AddIcon />
+              <Add />
             </Button>
-          </div>
+          </Stack>
           <Typography variant="h6">Breaks: {breaks.length}</Typography>
-        </div>
+        </Stack>
         {breaks.map((breakValue, index) => (
           <BreakInput
             breakValue={breakValue}

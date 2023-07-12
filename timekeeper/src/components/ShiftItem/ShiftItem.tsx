@@ -1,20 +1,10 @@
 import { WageObjectProps } from "../../database/database";
-import {
-  Card,
-  CardContent,
-  Typography,
-  Chip,
-  Box,
-  IconButton,
-  CircularProgress,
-  Button,
-  Stack,
-} from "@mui/material";
-import { Delete, Add } from "@mui/icons-material";
+import { Box, CircularProgress } from "@mui/material";
 import { useCallback, useState, useEffect, useRef, useContext } from "react";
 import { ThemeContext } from "../../context/ThemeContext";
 import { useSwipeable } from "react-swipeable";
 import { useWages } from "../../context/WagesContext";
+import ShiftItemCard from "./ShiftItemCard/ShiftItemCard";
 
 interface ShiftItemProps {
   wage: WageObjectProps;
@@ -144,92 +134,7 @@ const ShiftItem = ({ wage }: ShiftItemProps) => {
           }}
         >
           <div style={{ display: "flex", width: "100%" }}>
-            <Card
-              sx={{
-                width: "50%",
-                height: "100%",
-              }}
-            >
-              <CardContent
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between",
-                  minWidth: "100%",
-                  minHeight: "4.5rem",
-                  p: "1rem 1rem 0.5rem 1rem",
-                }}
-              >
-                <Typography
-                  variant="body1"
-                  sx={{
-                    textAlign: "left",
-                    fontSize: ".875rem",
-                  }}
-                >
-                  {wage.shiftDate.toDate().toLocaleDateString() +
-                    " - " +
-                    wage.shiftDate
-                      .toDate()
-                      .toLocaleDateString("en-us", { weekday: "long" })}
-                </Typography>
-                <Typography variant="h1" sx={{ fontWeight: "400" }}>
-                  {Intl.NumberFormat("en-US", {
-                    style: "currency",
-                    currency: wage.currency,
-                  }).format(wage.totalEarned)}
-                </Typography>
-                <Stack direction="row" spacing={1} flexWrap="wrap">
-                  <Chip
-                    size="small"
-                    label={"Tot. Hrs: " + wage.totalHours.toFixed(2)}
-                    color="primary"
-                    onDelete={() => console.log("I've been deleted :(")}
-                  />
-                  <Chip
-                    size="small"
-                    label={"Tot. Hrs: " + wage.totalHours.toFixed(2)}
-                    color="primary"
-                    onDelete={() => console.log("I've been deleted :(")}
-                  />
-                  <Chip
-                    size="small"
-                    label={"Tot. Hrs: " + wage.totalHours.toFixed(2)}
-                    color="primary"
-                    onDelete={() => console.log("I've been deleted :(")}
-                  />
-                  <Chip
-                    size="small"
-                    label={"Tot. Hrs: " + wage.totalHours.toFixed(2)}
-                    color="primary"
-                    onDelete={() => console.log("I've been deleted :(")}
-                  />
-                  <Button
-                    variant="outlined"
-                    sx={{
-                      p: "0",
-                      borderRadius: "16px",
-                    }}
-                  >
-                    <Add sx={{ fontSize: "1.25rem" }} />
-                  </Button>
-                </Stack>
-              </CardContent>
-            </Card>
-            <Box
-              sx={{
-                width: "50%",
-                height: "100%",
-                display: "flex",
-                justifyContent: "flex-start",
-                alignItems: "center",
-                backgroundColor: "#FF5353",
-              }}
-            >
-              <IconButton onClick={handleDelete}>
-                <Delete fontSize="large" />
-              </IconButton>
-            </Box>
+            <ShiftItemCard wage={wage} handleDelete={handleDelete} />
           </div>
         </div>
       </Box>
