@@ -75,9 +75,9 @@ export interface WageObjectProps {
 export interface DateRangeQuery {
   queryType:
     | "currentWeek"
-    | "pastWeek"
     | "pastMonth"
     | "pastSixMonths"
+    | "pastYear"
     | "custom";
   startDate?: Date;
   endDate?: Date;
@@ -93,17 +93,17 @@ export const GetFilteredWages = async (
   const userWagesRef = collection(FIREBASE_DB, user.uid);
   let q: Query<DocumentData>;
 
+  let current: Date;
+  let firstDate: Date;
+  let lastDate: Date;
+
   switch (dateRangeQuery.queryType) {
     case "currentWeek":
-      let current = new Date();
+      current = new Date();
       let first = current.getDate() - current.getDay();
       let last = first + 6;
-      let firstDate = new Date(
-        current.getFullYear(),
-        current.getMonth(),
-        first
-      );
-      let lastDate = new Date(current.getFullYear(), current.getMonth(), last);
+      firstDate = new Date(current.getFullYear(), current.getMonth(), first);
+      lastDate = new Date(current.getFullYear(), current.getMonth(), last);
 
       q = query(
         userWagesRef,
@@ -111,13 +111,63 @@ export const GetFilteredWages = async (
         where("shiftDate", "<=", lastDate)
       );
       break;
-    case "pastWeek":
-      break;
     case "pastMonth":
+      current = new Date();
+      firstDate = new Date(
+        current.getFullYear(),
+        current.getMonth() - 1,
+        current.getDate()
+      );
+      lastDate = current;
+
+      q = query(
+        userWagesRef,
+        where("shiftDate", ">=", firstDate),
+        where("shiftDate", "<=", lastDate)
+      );
       break;
     case "pastSixMonths":
+      current = new Date();
+      firstDate = new Date(
+        current.getFullYear(),
+        current.getMonth() - 6,
+        current.getDate()
+      );
+      lastDate = current;
+
+      q = query(
+        userWagesRef,
+        where("shiftDate", ">=", firstDate),
+        where("shiftDate", "<=", lastDate)
+      );
+      break;
+    case "pastYear":
+      current = new Date();
+      firstDate = new Date(
+        current.getFullYear() - 1,
+        current.getMonth(),
+        current.getDate()
+      );
+      lastDate = current;
+
+      q = query(
+        userWagesRef,
+        where("shiftDate", ">=", firstDate),
+        where("shiftDate", "<=", lastDate)
+      );
       break;
     case "custom":
+      if (!dateRangeQuery.startDate || !dateRangeQuery.endDate) {
+        throw new Error(
+          "Custom date range requires both a start and end date."
+        );
+      }
+
+      q = query(
+        userWagesRef,
+        where("shiftDate", ">=", dateRangeQuery.startDate),
+        where("shiftDate", "<=", dateRangeQuery.endDate)
+      );
       break;
     default:
       throw new Error(
@@ -176,7 +226,8 @@ export const GetWages = async (
 export const DeleteWage = async (user: FirebaseUser, docId: string) => {
   try {
     await deleteDoc(doc(FIREBASE_DB, user.uid, docId));
+    return true;
   } catch (err) {
-    console.log(err);
+    return false;
   }
 };

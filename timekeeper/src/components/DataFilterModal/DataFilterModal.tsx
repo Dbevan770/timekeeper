@@ -9,8 +9,48 @@ import {
 } from "@mui/material";
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { useState, useEffect, SyntheticEvent } from "react";
+import { useWages } from "../../context/WagesContext";
 
-const DataFilterModal = () => {
+const DataFilterModal = ({ openDataFilter }: { openDataFilter: boolean }) => {
+  const { setDateRange } = useWages();
+  const [tabValue, setTabValue] = useState(0);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+
+  const handleTabChange = (event: SyntheticEvent, newValue: number) => {
+    event.preventDefault();
+    setStartDate(null);
+    setEndDate(null);
+    setTabValue(newValue);
+    switch (newValue) {
+      case 0:
+        setDateRange({ queryType: "currentWeek" });
+        break;
+      case 1:
+        setDateRange({ queryType: "pastMonth" });
+        break;
+      case 2:
+        setDateRange({ queryType: "pastSixMonths" });
+        break;
+      case 3:
+        setDateRange({ queryType: "pastYear" });
+        break;
+      default:
+        break;
+    }
+  };
+
+  const handleDateChange = () => {
+    if (startDate && endDate) {
+      setDateRange({ queryType: "custom", startDate, endDate });
+    }
+  };
+
+  useEffect(() => {
+    handleDateChange();
+  }, [startDate, endDate]);
+
   return (
     <Box
       sx={{
@@ -19,14 +59,19 @@ const DataFilterModal = () => {
         top: "3.5rem",
         zIndex: "10",
         maxWidth: "95%",
+        display: openDataFilter ? "block" : "none",
       }}
     >
       <Paper elevation={5}>
-        <Tabs value={0} sx={{ minHeight: "32px" }}>
-          <Tab label="CW" sx={{ p: "0", minHeight: "32px" }} />
-          <Tab label="7D" sx={{ p: "0", minHeight: "32px" }} />
+        <Tabs
+          value={tabValue}
+          onChange={handleTabChange}
+          sx={{ minHeight: "32px" }}
+        >
+          <Tab label="W" sx={{ p: "0", minHeight: "32px" }} />
           <Tab label="M" sx={{ p: "0", minHeight: "32px" }} />
           <Tab label="6M" sx={{ p: "0", minHeight: "32px" }} />
+          <Tab label="Y" sx={{ p: "0", minHeight: "32px" }} />
         </Tabs>
         <Stack
           direction="row"
@@ -50,11 +95,19 @@ const DataFilterModal = () => {
           sx={{ margin: "0 1rem", paddingBottom: "2rem" }}
         >
           <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DatePicker label="Start Date" />
+            <DatePicker
+              label="Start Date"
+              value={startDate}
+              onChange={setStartDate}
+            />
           </LocalizationProvider>
           <Typography variant="body1"> to </Typography>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DatePicker label="End Date" />
+            <DatePicker
+              label="End Date"
+              value={endDate}
+              onChange={setEndDate}
+            />
           </LocalizationProvider>
         </Stack>
       </Paper>

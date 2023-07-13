@@ -23,7 +23,6 @@ import {
   calculateTotalBreaks,
   calculateEarned,
 } from "../../utils/calcHelper";
-import "./WageForm.css";
 import BreakInput from "../BreakInput/BreakInput";
 import TimeInput from "../TimeInput/TimeInput";
 import dayjs from "dayjs";

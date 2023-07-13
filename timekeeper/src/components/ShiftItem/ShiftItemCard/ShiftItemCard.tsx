@@ -14,7 +14,7 @@ import { useState } from "react";
 
 interface ShiftItemCardProps {
   wage: WageObjectProps;
-  handleDelete: () => void;
+  handleDelete: (docId: string) => void;
 }
 
 const ShiftItemCard = ({ wage, handleDelete }: ShiftItemCardProps) => {
@@ -123,7 +123,7 @@ const ShiftItemCard = ({ wage, handleDelete }: ShiftItemCardProps) => {
           backgroundColor: "#FF5353",
         }}
       >
-        <IconButton onClick={handleDelete}>
+        <IconButton onClick={() => handleDelete(wage.docId)}>
           <Delete fontSize="large" />
         </IconButton>
       </Box>

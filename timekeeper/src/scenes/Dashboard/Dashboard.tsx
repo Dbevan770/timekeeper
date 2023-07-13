@@ -1,7 +1,15 @@
 import { useAuthContext } from "../../context/AuthContext";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Typography, Button, Fab, Box, Grid } from "@mui/material";
+import {
+  Typography,
+  Button,
+  Fab,
+  Box,
+  Grid,
+  Backdrop,
+  CircularProgress,
+} from "@mui/material";
 import { Add, Home } from "@mui/icons-material";
 import { useWages } from "../../context/WagesContext";
 import Loading from "../../components/Loading/Loading";
@@ -29,9 +37,9 @@ const Dashboard = () => {
     month: "short",
   });
 
-  const handleClick = () => {
+  const handleClick = useCallback(() => {
     navigate("/dashboard/add-wages");
-  };
+  }, [navigate]);
 
   useEffect(() => {
     setLoading(true);
@@ -57,9 +65,10 @@ const Dashboard = () => {
           )}
           <NavHeader label="Dashboard" icon={Home} setLoading={setLoading} />
           <div className="dashboard-content">
-            {isLoadingWages ? (
-              <Loading label="Loading data..." />
-            ) : wages.length > 0 ? (
+            <Backdrop open={isLoadingWages} sx={{ color: "#fff", zIndex: 20 }}>
+              <CircularProgress color="primary" />
+            </Backdrop>
+            {wages.length > 0 ? (
               <>
                 <Box
                   sx={{
@@ -82,7 +91,7 @@ const Dashboard = () => {
                   >
                     {firstDate + " - " + lastDate}
                   </Button>
-                  {openDataFilter && <DataFilterModal />}
+                  <DataFilterModal openDataFilter={openDataFilter} />
                 </Box>
                 <Grid container spacing={1}>
                   <Widget
