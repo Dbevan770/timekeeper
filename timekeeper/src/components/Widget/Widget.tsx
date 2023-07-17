@@ -11,7 +11,7 @@ interface WidgetProps {
     | "totalEarned"
     | "totalHours"
     | "totalShifts"
-    | "breaks"
+    | "numBreaks"
     | "breakTime";
   contentType: "int" | "float" | "currency";
 }

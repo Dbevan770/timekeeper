@@ -68,31 +68,29 @@ const Dashboard = () => {
             <Backdrop open={isLoadingWages} sx={{ color: "#fff", zIndex: 20 }}>
               <CircularProgress color="primary" />
             </Backdrop>
+            <Box
+              sx={{
+                mt: "0.75rem",
+                mb: "0.75rem",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                p: "0 1rem",
+              }}
+            >
+              <Typography variant="h4">Hello {user?.displayName}!</Typography>
+              <Button
+                color="secondary"
+                variant="contained"
+                sx={{ position: "relative" }}
+                onClick={() => setOpenDataFiler(!openDataFilter)}
+              >
+                {firstDate + " - " + lastDate}
+              </Button>
+              <DataFilterModal openDataFilter={openDataFilter} />
+            </Box>
             {wages.length > 0 ? (
               <>
-                <Box
-                  sx={{
-                    mt: "0.75rem",
-                    mb: "0.75rem",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    p: "0 1rem",
-                  }}
-                >
-                  <Typography variant="h4">
-                    Hello {user?.displayName}!
-                  </Typography>
-                  <Button
-                    color="secondary"
-                    variant="contained"
-                    sx={{ position: "relative" }}
-                    onClick={() => setOpenDataFiler(!openDataFilter)}
-                  >
-                    {firstDate + " - " + lastDate}
-                  </Button>
-                  <DataFilterModal openDataFilter={openDataFilter} />
-                </Box>
                 <Grid container spacing={1}>
                   <Widget
                     label="Total Earnings"
@@ -116,7 +114,7 @@ const Dashboard = () => {
                   <Widget
                     label="Total Breaks"
                     wages={wages}
-                    content="breaks"
+                    content="numBreaks"
                     contentType="int"
                   />
                   <Widget
@@ -136,12 +134,13 @@ const Dashboard = () => {
                     color: "rgba(255,255,255,0.48)",
                     marginBottom: "2rem",
                   }}
+                  className="EmptyContentTitle"
                 >
                   Hmm, there's nothing here!
                 </Typography>
                 <Button
                   variant="contained"
-                  startIcon={<Add />}
+                  startIcon={<Add className="AddShiftIcon" />}
                   onClick={handleClick}
                   sx={{ fontSize: "1rem", verticalAlign: "middle" }}
                 >

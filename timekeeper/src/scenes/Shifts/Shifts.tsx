@@ -12,7 +12,7 @@ const Shifts = () => {
     {}
   );
   const [message, setMessage] = useState<string>("");
-  const [severity, setSeverity] = useState<"error" | "success">();
+  const [severity, setSeverity] = useState<"error" | "success">("error");
   const [isUndoAction, setIsUndoAction] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const { wages, isLoadingWages, undoDelete, deleteWage } = useWages();
@@ -56,17 +56,18 @@ const Shifts = () => {
   };
 
   return (
-    <Box sx={{ width: "100%", height: "100dvh", p: "0.5rem" }}>
+    <Box sx={{ width: "100%", height: "100dvh" }}>
       <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
         <NavHeader label="Shifts" setLoading={setLoading} icon={AccessTime} />
         <Box
           sx={{
             flex: "1 0 auto",
-            maxHeight: "90dvh",
+            maxHeight: "95dvh",
             overflowY: "auto",
             overflowX: "hidden",
-            margin: "0.75rem 0 0 0",
+            marginTop: "1.5rem",
             paddingRight: "0.75rem",
+            paddingLeft: "0.5rem",
           }}
         >
           {loading ? (
@@ -74,10 +75,7 @@ const Shifts = () => {
           ) : !isLoadingWages ? (
             wages.length > 0 ? (
               <>
-                <Stack
-                  spacing={1.5}
-                  sx={{ paddingBottom: "0.5rem", alignItems: "stretch" }}
-                >
+                <Stack spacing={1.5} sx={{ paddingBottom: "0.5rem" }}>
                   {wages.map((wage) => {
                     return (
                       <ShiftItem
@@ -85,6 +83,9 @@ const Shifts = () => {
                         wage={wage}
                         handleDelete={handleDelete}
                         isCollapsed={collapsedItems[wage.docId] || false}
+                        setSnackbarOpen={setSnackbarOpen}
+                        setMessage={setMessage}
+                        setSeverity={setSeverity}
                       />
                     );
                   })}

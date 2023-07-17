@@ -39,7 +39,10 @@ const TimeInput = ({
   ];
   return (
     <>
-      <Typography variant="subtitle1" sx={{ fontSize: ".75rem" }}>
+      <Typography
+        variant="subtitle1"
+        sx={{ fontSize: ".75rem", textAlign: "center" }}
+      >
         {label}
       </Typography>
       <Stack

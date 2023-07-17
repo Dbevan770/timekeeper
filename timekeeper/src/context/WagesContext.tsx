@@ -12,6 +12,7 @@ import {
   CreateWageProps,
   DateRangeQuery,
   CreateWage,
+  UpdateWage,
   DeleteWage,
 } from "../database/database";
 import { Timestamp } from "firebase/firestore";
@@ -29,6 +30,9 @@ interface WagesContextType {
   deleteWage: (docId: string) => Promise<boolean>;
   setDateRange: (dateRangeQuery: DateRangeQuery) => void;
   undoDelete: () => Promise<boolean>;
+  updateWage: (
+    wage: WageObjectProps
+  ) => Promise<{ success: boolean; msg: string }>;
 }
 
 const WagesContext = createContext<WagesContextType | undefined>(undefined);
@@ -56,16 +60,18 @@ export const WagesProvider = ({ children }: { children: ReactNode }) => {
 
   const getWages = useCallback(async () => {
     setIsLoadingWages(true);
-    let result: WageObjectProps[] = [];
+    let result;
 
     if (user) {
       result = await GetFilteredWages(user, dateRangeQuery);
 
-      // Sort the result array by shiftDate in descending order
-      result.sort((a, b) => b.shiftDate.toMillis() - a.shiftDate.toMillis());
+      if (result.success && result.data) {
+        result.data.sort(
+          (a, b) => b.shiftDate.toMillis() - a.shiftDate.toMillis()
+        );
+        setWages(result.data);
+      }
     }
-
-    setWages(result);
     setIsLoadingWages(false);
   }, [user, dateRangeQuery]);
 
@@ -90,19 +96,23 @@ export const WagesProvider = ({ children }: { children: ReactNode }) => {
 
     try {
       const newWage = await CreateWage(user, wage);
-      if (!newWage) {
-        throw new Error(
-          "Wage was not successfully added to the database. Rolling back local state update..."
-        );
-      } else {
+      if (!newWage.success) {
+        return { success: false, msg: newWage.error || "An error occurred." };
+      } else if (newWage.success && newWage.data) {
+        const newWageData = newWage.data[0];
         setWages((prevWages) =>
           sortWages(
             prevWages.map((prevWage) =>
-              prevWage.docId === tempId ? newWage : prevWage
+              prevWage.docId === tempId ? newWageData : prevWage
             )
           )
         );
         return { success: true, msg: "Save successful" };
+      } else {
+        return {
+          success: false,
+          msg: "Operation successful but no data returned.",
+        };
       }
     } catch (err) {
       setWages((prevWages) =>
@@ -121,6 +131,9 @@ export const WagesProvider = ({ children }: { children: ReactNode }) => {
         return false;
       }
 
+      // Set the item marked for deletion to last deleted item for potential to undo
+      // this action. Also optimistically remove marked item from local state before
+      // attempting to delete it from the database.
       setLastDeletedWage(wageToBeDeleted);
       setWages((prevWages) => prevWages.filter((wage) => wage.docId !== docId));
 
@@ -140,7 +153,7 @@ export const WagesProvider = ({ children }: { children: ReactNode }) => {
     if (lastDeletedWage !== undefined && user !== null) {
       const convertedWage = convertToCreateWageProps(lastDeletedWage);
       const response = await addWage(convertedWage);
-      if (response.success) {
+      if (response?.success) {
         setLastDeletedWage(undefined);
         return true;
       } else {
@@ -155,6 +168,47 @@ export const WagesProvider = ({ children }: { children: ReactNode }) => {
     setDateRangeQuery(newDateRangeQuery);
   };
 
+  const updateWage = async (wage: WageObjectProps) => {
+    if (user === null)
+      return { success: false, msg: "You are not authenticated." };
+
+    const wageIndex = wages.findIndex((w) => w.docId === wage.docId);
+    if (wageIndex === -1)
+      return { success: false, msg: "The provided document id was not found." };
+
+    const oldWage = wages[wageIndex];
+
+    setWages((prevWages) => {
+      const newWages = [...prevWages];
+      newWages[wageIndex] = wage;
+      return sortWages(newWages);
+    });
+
+    try {
+      const updatedWage = await UpdateWage(user, wage);
+      if (!updatedWage.success) {
+        setWages((prevWages) => {
+          const newWages = [...prevWages];
+          newWages[wageIndex] = oldWage;
+          return sortWages(newWages);
+        });
+
+        return { success: false, msg: updatedWage.error || "Update failed." };
+      }
+
+      return { success: true, msg: "Update successful!" };
+    } catch (err) {
+      // If there's an error, revert the wage.
+      setWages((prevWages) => {
+        const newWages = [...prevWages];
+        newWages[wageIndex] = oldWage;
+        return sortWages(newWages);
+      });
+
+      return { success: false, msg: "Operation to update data failed." };
+    }
+  };
+
   const value = {
     wages,
     isLoadingWages,
@@ -163,6 +217,7 @@ export const WagesProvider = ({ children }: { children: ReactNode }) => {
     deleteWage,
     setDateRange,
     undoDelete,
+    updateWage,
   };
 
   return (

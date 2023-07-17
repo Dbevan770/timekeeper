@@ -1,0 +1,30 @@
+.expand {
+  animation: expand-animation 0.3s;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+}
+
+.collapse {
+  animation-name: collapse-animation 0.3s;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+  animation-timing-function: ease;
+}
+
+@keyframes collapse-animation {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(var(--swipeDist));
+  }
+}
+
+@keyframes expand-animation {
+  from {
+    transform: translateX(var(--swipeDist));
+  }
+  to {
+    transform: translateX(0);
+  }
+}
