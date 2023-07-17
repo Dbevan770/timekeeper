@@ -11,7 +11,7 @@ const getTheme = (mode: "light" | "dark") => {
         main: "#f151ff",
       },
       background: {
-        default: mode === "dark" ? "#121212" : "#ffffff",
+        default: mode === "dark" ? "#121212" : "hsl(0, 0%, 95%)",
       },
       text: {
         primary: mode === "dark" ? "#e1e1e1" : "#000000",
@@ -31,10 +31,16 @@ const getTheme = (mode: "light" | "dark") => {
           },
           h1: {
             color: mode == "dark" ? "#e1e1e1" : "#000000",
+            "&.ShiftItemCurrency": {
+              color: mode === "dark" ? "hsl(0, 0%, 90%)" : "hsl(0, 0%, 12%)",
+            },
           },
           h5: {
             "&.NavHeaderText": {
               color: mode === "dark" ? "#e1e1e1" : "#ffffff",
+            },
+            "&.EmptyContentTitle": {
+              color: mode === "dark" ? "#e1e1e1" : "#000000",
             },
           },
           body1: {
@@ -44,6 +50,9 @@ const getTheme = (mode: "light" | "dark") => {
               color:
                 mode === "dark" ? "rgba(255,255,255,0.48)" : "rgba(0,0,0,0.48)",
               textAlign: "left",
+            },
+            "&.EmailVerifyBody": {
+              color: "#c22727",
             },
           },
           overline: {
@@ -220,6 +229,9 @@ const getTheme = (mode: "light" | "dark") => {
             },
             "&.FabIcon": {
               color: mode === "dark" ? "#121212" : "#000000",
+            },
+            "&.AddShiftIcon": {
+              color: mode === "dark" ? "#121212" : "#ffffff",
             },
             "&.MuiSelect-icon": {
               color: mode === "dark" ? "#e1e1e1" : "#000000",

@@ -1,43 +1,41 @@
-import "./ShiftItem.css";
 import { WageObjectProps } from "../../database/database";
-import {
-  Card,
-  CardContent,
-  Typography,
-  Chip,
-  Box,
-  IconButton,
-  CircularProgress,
-} from "@mui/material";
-import { Delete } from "@mui/icons-material";
-import { useCallback, useState, useEffect, useRef, useContext } from "react";
+import { Box, Collapse, IconButton, Typography } from "@mui/material";
+import { Delete, Edit } from "@mui/icons-material";
+import { useState, useEffect, useRef, useContext } from "react";
 import { ThemeContext } from "../../context/ThemeContext";
 import { useSwipeable } from "react-swipeable";
-import { useWages } from "../../context/WagesContext";
+import ShiftItemCard from "./ShiftItemCard/ShiftItemCard";
+import FormDialog from "../FormDialog/FormDialog";
+import "./ShiftItem.css";
 
 interface ShiftItemProps {
   wage: WageObjectProps;
+  handleDelete: (docId: string) => void;
+  isCollapsed: boolean;
+  setSnackbarOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setMessage: React.Dispatch<React.SetStateAction<string>>;
+  setSeverity: React.Dispatch<React.SetStateAction<"error" | "success">>;
 }
 
-const ShiftItem = ({ wage }: ShiftItemProps) => {
+const ShiftItem = ({
+  wage,
+  handleDelete,
+  isCollapsed,
+  setSnackbarOpen,
+  setMessage,
+  setSeverity,
+}: ShiftItemProps) => {
   const { themeMode } = useContext(ThemeContext);
-
+  const [deletionIsMaxWidth, setDeletionIsMaxWidth] = useState(false);
+  const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [swipeDist, setSwipeDist] = useState(0);
+  const [minSwipeDist, setMinSwipeDist] = useState(0);
   const [maxSwipeDist, setMaxSwipeDist] = useState(0);
   const [deletionTrigger, setDeletionTrigger] = useState(0);
-  const [isSwiping, setIsSwiping] = useState<boolean>(false);
-  const [loading, setLoading] = useState(false);
+  const [isSwiping, setIsSwiping] = useState(false);
   const [deletionTriggered, setDeletionTriggered] = useState(false);
-  const { deleteWage, refreshWages } = useWages();
   const swipeOffset = useRef(0);
   const swipableRef = useRef<HTMLDivElement | null>(null);
-
-  const handleDelete = useCallback(async () => {
-    setLoading(true);
-    await deleteWage(wage.docId);
-    await refreshWages();
-    setLoading(false);
-  }, [deleteWage, refreshWages, wage.docId]);
 
   const handlers = useSwipeable({
     onSwipeStart: () => {
@@ -46,22 +44,37 @@ const ShiftItem = ({ wage }: ShiftItemProps) => {
     },
     onSwiping: (eventData) => {
       let currentSwipeDist = swipeDist;
-      if (!loading) {
+      const baseSwipe = swipeOffset.current - eventData.deltaX + 10;
+
+      if (baseSwipe <= deletionTrigger) {
+        currentSwipeDist = Math.max(0, Math.min(maxSwipeDist, baseSwipe));
+        setDeletionIsMaxWidth(false);
+      } else {
+        // Amount by which we've exceeded the deletionTrigger
+        const overSwipe = baseSwipe - deletionTrigger;
+        setDeletionIsMaxWidth(true);
+        // Apply scaling factor to the overSwipe only, so that we slow down the more we are past the deletionTrigger.
+        const scalingFactor = 0.25; // Modify to adjust the rate of slowing down.
         currentSwipeDist = Math.min(
-          Math.max(0, swipeOffset.current - eventData.deltaX + 10),
-          maxSwipeDist
+          maxSwipeDist,
+          deletionTrigger + scalingFactor * overSwipe
         );
-        setSwipeDist(currentSwipeDist);
       }
+
+      setSwipeDist(currentSwipeDist);
     },
     onSwiped: (eventData) => {
       if (eventData.dir === "Left" && swipeDist > deletionTrigger) {
-        setDeletionTriggered(true);
-      } else if (swipeDist > 51) {
-        setSwipeDist(51);
+        // setDeletionTriggered(true);
+      } else if (
+        eventData.dir === "Left" &&
+        (swipeDist > minSwipeDist || swipeDist > 0)
+      ) {
+        setSwipeDist(minSwipeDist);
       } else {
         setSwipeDist(0);
       }
+      setDeletionIsMaxWidth(false);
       setIsSwiping(false);
     },
     delta: { up: 250, down: 250, left: 10, right: 10 },
@@ -72,9 +85,8 @@ const ShiftItem = ({ wage }: ShiftItemProps) => {
     let deletionTimeout: ReturnType<typeof setTimeout>;
     if (deletionTriggered) {
       setSwipeDist(maxSwipeDist);
-
       deletionTimeout = setTimeout(() => {
-        handleDelete();
+        handleDelete(wage.docId);
       }, 300);
     }
 
@@ -86,48 +98,40 @@ const ShiftItem = ({ wage }: ShiftItemProps) => {
   useEffect(() => {
     if (swipableRef.current) {
       const width = swipableRef.current.offsetWidth;
-      setMaxSwipeDist(width / 2);
-      setDeletionTrigger(width / 4);
+      setMaxSwipeDist(width * 0.5);
+      setDeletionTrigger(width * 0.28);
+      setMinSwipeDist(width * 0.142);
     }
   }, []);
 
   return (
-    <Box
-      sx={{
-        borderRadius: "0.25rem",
-        overflow: "hidden",
-        width: "100%",
-        minHeight: "8.625rem",
-        position: "relative",
-        border: themeMode === "dark" ? "none" : "1px solid rgba(0,0,0,0.48)",
-        boxShadow:
-          themeMode === "dark" ? "none" : "10px 5px 5px rgba(0,0,0,0.6)",
-      }}
-    >
-      <div className="shift-item-container" {...handlers}>
-        {loading && (
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              position: "absolute",
-              top: 0,
-              zIndex: "10",
-              width: "100%",
-              height: "100%",
-              backgroundColor: "rgba(0,0,0,0.48)",
-            }}
-          >
-            <CircularProgress />
-          </Box>
-        )}
+    <Collapse in={!isCollapsed}>
+      <FormDialog
+        open={formDialogOpen}
+        setOpen={setFormDialogOpen}
+        wageItem={wage}
+        openSnackbar={setSnackbarOpen}
+        setMessage={setMessage}
+        setSeverity={setSeverity}
+      />
+      <Box
+        sx={{
+          borderRadius: "0.25rem",
+          overflow: "hidden",
+          width: "100%",
+          height: "100%",
+          position: "relative",
+          boxShadow:
+            themeMode === "dark" ? "none" : "0 2px 6px 0 hsla(0, 0%, 0%, 0.2)",
+        }}
+        {...handlers}
+      >
         <div
           ref={swipableRef}
           style={{
+            position: "relative",
             display: "flex",
-            alignItems: "center",
-            height: "8.625rem",
+            height: "100%",
             width: "200%",
             transform: `translateX(-${swipeDist}px)`,
             transition: isSwiping ? "none" : "transform 0.3s ease",
@@ -135,64 +139,79 @@ const ShiftItem = ({ wage }: ShiftItemProps) => {
             overflow: "hidden",
           }}
         >
-          <Card
-            sx={{
-              width: "50%",
-              height: "100%",
-            }}
-          >
-            <CardContent
-              sx={{
-                minWidth: "100%",
-                height: "100%",
-                p: "1rem 1rem 0.5rem 1rem",
-              }}
-            >
-              <Typography
-                variant="body1"
-                sx={{
-                  textAlign: "left",
-                  fontSize: ".875rem",
-                }}
-              >
-                {wage.shiftDate.toDate().toLocaleDateString() +
-                  " - " +
-                  wage.shiftDate
-                    .toDate()
-                    .toLocaleDateString("en-us", { weekday: "long" })}
-              </Typography>
-              <Typography variant="h1" sx={{ fontWeight: "400" }}>
-                {Intl.NumberFormat("en-US", {
-                  style: "currency",
-                  currency: wage.currency,
-                }).format(wage.totalEarned)}
-              </Typography>
-              <div className="chip-container">
-                <Chip
-                  size="small"
-                  label={"Total Hours: " + wage.totalHours.toFixed(2)}
-                  color="primary"
-                />
-              </div>
-            </CardContent>
-          </Card>
+          <div style={{ display: "flex", width: "50%" }}>
+            <ShiftItemCard wage={wage} />
+          </div>
           <Box
             sx={{
               width: "50%",
-              height: "inherit",
+              height: "100%",
               display: "flex",
               justifyContent: "flex-start",
               alignItems: "center",
-              backgroundColor: "#FF5353",
+              backgroundColor: "#f5e76c",
             }}
           >
-            <IconButton onClick={handleDelete}>
-              <Delete fontSize="large" />
+            <IconButton
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+              onClick={() => setFormDialogOpen(true)}
+            >
+              <Edit fontSize="large" sx={{ color: "#000000" }} />
+              <Typography variant="body2" sx={{ color: "#000000" }}>
+                Edit
+              </Typography>
             </IconButton>
           </Box>
+          <div
+            className={
+              swipeDist > deletionTrigger
+                ? "expand"
+                : swipeDist <= deletionTrigger
+                ? "collapse"
+                : ""
+            }
+            style={
+              {
+                position: "absolute",
+                display: "flex",
+                justifyContent: "flex-start",
+                alignItems: "center",
+                top: "0",
+                right: "0",
+                width: "50%",
+                height: "100%",
+                backgroundColor: "#FF5353",
+                zIndex: 1,
+                "--swipeDist": `${swipeDist / 2}px`,
+                transform: deletionIsMaxWidth
+                  ? "translateX(0px)"
+                  : `translateX(${swipeDist / 2}px)`,
+
+                transition: isSwiping ? "none" : "transform 0.3s ease",
+              } as React.CSSProperties & { [key: string]: any }
+            }
+          >
+            <IconButton
+              onClick={() => handleDelete(wage.docId)}
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Delete fontSize="large" />
+              <Typography variant="body2">Delete</Typography>
+            </IconButton>
+          </div>
         </div>
-      </div>
-    </Box>
+      </Box>
+    </Collapse>
   );
 };
 

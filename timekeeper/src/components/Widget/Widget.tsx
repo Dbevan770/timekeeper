@@ -1,5 +1,5 @@
 import { WageObjectProps } from "../../database/database";
-import { Paper, Typography, Box, Skeleton } from "@mui/material";
+import { Paper, Typography, Skeleton, Grid } from "@mui/material";
 import { ThemeContext } from "../../context/ThemeContext";
 import { useEffect, useState, useContext } from "react";
 
@@ -11,7 +11,7 @@ interface WidgetProps {
     | "totalEarned"
     | "totalHours"
     | "totalShifts"
-    | "breaks"
+    | "numBreaks"
     | "breakTime";
   contentType: "int" | "float" | "currency";
 }
@@ -64,16 +64,16 @@ const Widget = ({ label, wages, width = "half", content }: WidgetProps) => {
   return wages.length === 0 ? (
     <Skeleton animation="wave" />
   ) : (
-    <Box sx={{ gridColumn: width === "half" ? "span 1" : "span 2" }}>
+    <Grid item xs={width === "half" ? 6 : 12}>
       <Paper sx={{ padding: "1rem" }} elevation={themeMode === "dark" ? 0 : 3}>
         <Typography variant="body1" className="WidgetTitle">
           {label}
         </Typography>
-        <Typography variant="h1" sx={{ textAlign: "left" }}>
+        <Typography variant="h1" sx={{ textAlign: "left" }} noWrap>
           {contentFormatter(content, value)}
         </Typography>
       </Paper>
-    </Box>
+    </Grid>
   );
 };
 

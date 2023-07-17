@@ -1,4 +1,6 @@
 import { CircularProgress, Typography, Box } from "@mui/material";
+import { useContext } from "react";
+import { ThemeContext } from "../../context/ThemeContext";
 import "./Loading.css";
 
 interface LoadingProps {
@@ -6,6 +8,8 @@ interface LoadingProps {
 }
 
 const Loading = ({ label }: LoadingProps) => {
+  const { themeMode } = useContext(ThemeContext);
+
   return (
     <Box
       sx={{
@@ -16,10 +20,18 @@ const Loading = ({ label }: LoadingProps) => {
         gap: "2rem",
         justifyContent: "center",
         alignItems: "center",
+        backgroundColor: themeMode === "dark" ? "#242424" : "#ffffff",
       }}
     >
-      <Typography variant="h4">{label}</Typography>
-      <CircularProgress color="primary" />
+      <Typography
+        variant="h4"
+        sx={{ color: themeMode === "dark" ? "#e1e1e1" : "#000000" }}
+      >
+        {label}
+      </Typography>
+      <CircularProgress
+        sx={{ color: themeMode === "dark" ? "#5fff51" : "0f7cdb" }}
+      />
     </Box>
   );
 };

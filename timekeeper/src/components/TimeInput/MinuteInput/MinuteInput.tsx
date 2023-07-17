@@ -1,5 +1,5 @@
 import { TextField } from "@mui/material";
-import React from "react";
+import { handleMinuteChange } from "../../../utils/timeHelper";
 
 interface MinuteInputProps {
   minute: string;
@@ -8,22 +8,6 @@ interface MinuteInputProps {
 }
 
 const MinuteInput = ({ minute, setMin, disabled }: MinuteInputProps) => {
-  const handleMinuteChange = (
-    value: string,
-    setter: React.Dispatch<React.SetStateAction<string>>
-  ) => {
-    const intValue = parseInt(value);
-    if (isNaN(intValue)) {
-      setter("");
-      return;
-    } else if (intValue > 59 || intValue < 0 || value.length > 2) {
-      return;
-    } else {
-      setter(value);
-      return;
-    }
-  };
-
   return (
     <TextField
       value={minute}

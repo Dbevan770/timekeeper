@@ -1,23 +1,45 @@
 import { useAuthContext } from "../../context/AuthContext";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Typography, Button, Fab, Box } from "@mui/material";
+import {
+  Typography,
+  Button,
+  Fab,
+  Box,
+  Grid,
+  Backdrop,
+  CircularProgress,
+} from "@mui/material";
 import { Add, Home } from "@mui/icons-material";
 import { useWages } from "../../context/WagesContext";
 import Loading from "../../components/Loading/Loading";
+import DataFilterModal from "../../components/DataFilterModal/DataFilterModal";
 import "./Dashboard.css";
 import NavHeader from "../../components/NavHeader/NavHeader";
 import Widget from "../../components/Widget/Widget";
 
 const Dashboard = () => {
   const [loading, setLoading] = useState<boolean>(false);
+  const [openDataFilter, setOpenDataFiler] = useState<boolean>(false);
   const { wages, isLoadingWages } = useWages();
   const { user } = useAuthContext();
   const navigate = useNavigate();
+  let current = new Date();
+  let first = current.getDate() - current.getDay();
+  let last = first + 6;
 
-  const handleClick = () => {
+  let firstDate = new Date(current.setDate(first)).toLocaleString("en-US", {
+    day: "numeric",
+    month: "short",
+  });
+  let lastDate = new Date(current.setDate(last)).toLocaleString("en-US", {
+    day: "numeric",
+    month: "short",
+  });
+
+  const handleClick = useCallback(() => {
     navigate("/dashboard/add-wages");
-  };
+  }, [navigate]);
 
   useEffect(() => {
     setLoading(true);
@@ -43,32 +65,33 @@ const Dashboard = () => {
           )}
           <NavHeader label="Dashboard" icon={Home} setLoading={setLoading} />
           <div className="dashboard-content">
-            {isLoadingWages ? (
-              <Loading label="Loading data..." />
-            ) : wages.length > 0 ? (
+            <Backdrop open={isLoadingWages} sx={{ color: "#fff", zIndex: 20 }}>
+              <CircularProgress color="primary" />
+            </Backdrop>
+            <Box
+              sx={{
+                mt: "0.75rem",
+                mb: "0.75rem",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                p: "0 1rem",
+              }}
+            >
+              <Typography variant="h4">Hello {user?.displayName}!</Typography>
+              <Button
+                color="secondary"
+                variant="contained"
+                sx={{ position: "relative" }}
+                onClick={() => setOpenDataFiler(!openDataFilter)}
+              >
+                {firstDate + " - " + lastDate}
+              </Button>
+              <DataFilterModal openDataFilter={openDataFilter} />
+            </Box>
+            {wages.length > 0 ? (
               <>
-                <Box
-                  sx={{
-                    mt: "0.75rem",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    p: "0 1rem",
-                  }}
-                >
-                  <Typography variant="h4">
-                    Hello {user?.displayName}!
-                  </Typography>
-                  <Typography variant="body1">&lt; 7days</Typography>
-                </Box>
-                <Box
-                  sx={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(2, 1fr)",
-                    gap: "0.5rem",
-                    marginTop: "0.5rem",
-                  }}
-                >
+                <Grid container spacing={1}>
                   <Widget
                     label="Total Earnings"
                     width="full"
@@ -91,7 +114,7 @@ const Dashboard = () => {
                   <Widget
                     label="Total Breaks"
                     wages={wages}
-                    content="breaks"
+                    content="numBreaks"
                     contentType="int"
                   />
                   <Widget
@@ -100,7 +123,7 @@ const Dashboard = () => {
                     content="breakTime"
                     contentType="float"
                   />
-                </Box>
+                </Grid>
               </>
             ) : (
               <div className="empty-content">
@@ -111,12 +134,13 @@ const Dashboard = () => {
                     color: "rgba(255,255,255,0.48)",
                     marginBottom: "2rem",
                   }}
+                  className="EmptyContentTitle"
                 >
                   Hmm, there's nothing here!
                 </Typography>
                 <Button
                   variant="contained"
-                  startIcon={<Add />}
+                  startIcon={<Add className="AddShiftIcon" />}
                   onClick={handleClick}
                   sx={{ fontSize: "1rem", verticalAlign: "middle" }}
                 >
