@@ -70,6 +70,35 @@ const Shifts = () => {
             paddingLeft: "0.5rem",
           }}
         >
+          <Snackbar
+            open={snackbarOpen}
+            autoHideDuration={6000}
+            onClose={handleSnackbarClose}
+          >
+            <Alert
+              severity={severity}
+              sx={{ width: "100%" }}
+              variant="filled"
+              onClose={handleSnackbarClose}
+              action={[
+                isUndoAction && (
+                  <Button color="inherit" size="small" onClick={handleUndo}>
+                    UNDO
+                  </Button>
+                ),
+                <IconButton
+                  aria-label="close"
+                  color="inherit"
+                  size="small"
+                  onClick={handleSnackbarClose}
+                >
+                  <Close fontSize="inherit" />
+                </IconButton>,
+              ]}
+            >
+              {message}
+            </Alert>
+          </Snackbar>
           {loading ? (
             <Loading label="Loading data..." />
           ) : !isLoadingWages ? (
@@ -90,39 +119,6 @@ const Shifts = () => {
                     );
                   })}
                 </Stack>
-                <Snackbar
-                  open={snackbarOpen}
-                  autoHideDuration={6000}
-                  onClose={handleSnackbarClose}
-                >
-                  <Alert
-                    severity={severity}
-                    sx={{ width: "100%" }}
-                    variant="filled"
-                    onClose={handleSnackbarClose}
-                    action={[
-                      isUndoAction && (
-                        <Button
-                          color="inherit"
-                          size="small"
-                          onClick={handleUndo}
-                        >
-                          UNDO
-                        </Button>
-                      ),
-                      <IconButton
-                        aria-label="close"
-                        color="inherit"
-                        size="small"
-                        onClick={handleSnackbarClose}
-                      >
-                        <Close fontSize="inherit" />
-                      </IconButton>,
-                    ]}
-                  >
-                    {message}
-                  </Alert>
-                </Snackbar>
               </>
             ) : (
               <div>No wages</div>
