@@ -65,7 +65,7 @@ const ShiftItem = ({
     },
     onSwiped: (eventData) => {
       if (eventData.dir === "Left" && swipeDist > deletionTrigger) {
-        // setDeletionTriggered(true);
+        setDeletionTriggered(true);
       } else if (
         eventData.dir === "Left" &&
         (swipeDist > minSwipeDist || swipeDist > 0)

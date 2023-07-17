@@ -31,6 +31,7 @@ const Account = () => {
   };
 
   const handleClose = () => {
+    console.log(loading);
     // localStorage.setItem("verifiedCta", "hide");
     setShowVerified("hide");
   };
