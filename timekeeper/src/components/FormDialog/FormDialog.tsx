@@ -217,6 +217,7 @@ const FormDialog = ({
   };
 
   const handleClose = () => {
+    setDisabled(false);
     setOpen(false);
   };
 
@@ -236,6 +237,7 @@ const FormDialog = ({
               id="select-currency"
               value={currency}
               onChange={(e) => setCurrency(e.target.value)}
+              disabled={disabled}
               select
               label="Currency"
               defaultValue="EUR"
@@ -253,6 +255,7 @@ const FormDialog = ({
               onChange={(e) => setRate(e.target.value)}
               variant="outlined"
               label="Rate"
+              disabled={disabled}
               fullWidth
               required
               InputProps={{
@@ -268,6 +271,7 @@ const FormDialog = ({
             <DatePicker
               label="Date of Shift"
               value={dayjs(shiftDate)}
+              disabled={disabled}
               onChange={(date: Dayjs | null) =>
                 setShiftDate(date?.toDate() ?? null)
               }
