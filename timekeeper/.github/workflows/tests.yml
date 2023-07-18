@@ -27,6 +27,5 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
-          cache-dependency-path: ./timekeeper/package-lock.json
-      - run: cd timekeeper && npm ci
-      - run: cd timekeeper && npm test
+      - name: Execute Unit tests
+        run: cd timekeeper && npm ci && npm run test
