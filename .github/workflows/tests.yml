@@ -26,4 +26,4 @@ jobs:
       - run: cd timekeeper && npm ci
 
       - name: Execute Unit tests
-        run: npm run test
+        run: cd timekeeper && npm run test
