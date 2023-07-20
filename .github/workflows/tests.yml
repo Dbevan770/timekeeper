@@ -25,11 +25,11 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - run: cd timekeeper && npm ci
 
-      - name: Setup Firebase Emulators
-        run: |
-          curl -sL https://firebase.tools | bash
-          firebase emulators:start --only firestore,auth &
-          sleep 5
+      - name: Cache Firebase emulators
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/firebase/emulators
+          key: ${{ runner.os }}-firebase-emulators-${{ hashFiles('~/.cache/firebase/emulators/**') }}
 
       - name: Execute Unit tests
         run: cd timekeeper && npm run test
