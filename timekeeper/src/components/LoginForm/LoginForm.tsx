@@ -6,10 +6,14 @@ import {
   Button,
   Backdrop,
   CircularProgress,
+  Stack,
+  Divider,
 } from "@mui/material";
 import { Email, Visibility, VisibilityOff } from "@mui/icons-material";
+import { GoogleLogo } from "../IconComponents/GoogleLogo/GoogleLogo";
 import { useState } from "react";
 import { SignIn } from "../../auth/signin";
+import { GoogleSignIn } from "../../auth/googleSignIn";
 
 export interface LoginFormProps {
   setMessage: React.Dispatch<React.SetStateAction<string>>;
@@ -57,6 +61,15 @@ export const LoginForm = ({
       setMessage("E-mail or password is incorrect.");
       setSeverity("error");
       setOpenSnackbar(true);
+    }
+  };
+
+  const handleGoogleSignIn = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    try {
+      await GoogleSignIn();
+    } catch (err) {
+      console.log(err);
     }
   };
 
@@ -141,6 +154,30 @@ export const LoginForm = ({
       </Typography>
       <Button variant="contained" type="submit" disabled={loading}>
         SIGN IN
+      </Button>
+      <Stack
+        direction="row"
+        justifyContent="center"
+        alignItems="center"
+        sx={{ margin: "1rem 0" }}
+        spacing={2}
+      >
+        <Divider sx={{ borderWidth: "2px", flex: "1 1 auto" }} />
+        <Typography variant="body1">OR</Typography>
+        <Divider sx={{ borderWidth: "2px", flex: "1 1 auto" }} />
+      </Stack>
+      <Button
+        variant="contained"
+        type="button"
+        sx={{
+          textTransform: "none",
+          backgroundColor: "#FFFFFF",
+        }}
+        disabled={loading}
+        onClick={handleGoogleSignIn}
+        startIcon={<GoogleLogo />}
+      >
+        Sign in with Google
       </Button>
     </form>
   );
