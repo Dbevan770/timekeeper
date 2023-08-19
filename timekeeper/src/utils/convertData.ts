@@ -6,14 +6,8 @@ export const convertToCreateWageProps = (
   return {
     totalHours: wage.totalHours,
     shiftDate: wage.shiftDate.toDate(), // convert FirebaseTimestamp to Date
-    startHour: wage.startHour,
-    startMinute: wage.startMinute,
-    startMeridian: wage.startMeridian,
-    startTime: wage.startTime,
-    endHour: wage.endHour,
-    endMinute: wage.endMinute,
-    endMeridian: wage.endMeridian,
-    endTime: wage.endTime,
+    startTime: wage.startTime.toDate(),
+    endTime: wage.endTime.toDate(),
     numBreaks: wage.numBreaks,
     breaks: wage.breaks,
     breakTime: wage.breakTime,
