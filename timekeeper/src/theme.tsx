@@ -23,9 +23,11 @@ const getTheme = (mode: "light" | "dark") => {
           root: {
             color: mode === "dark" ? "#e1e1e1" : "#000000",
             "&.MuiPickersToolbarText-root": {
-              color: mode === "dark" ? "#e1e1e1" : "#000000",
+              color:
+                mode === "dark" ? "rgba(225,225,225,0.6)" : "rgba(0,0,0,0.6)",
               "&.Mui-selected": {
-                color: "white",
+                color: mode === "dark" ? "#ffffff" : "#000000",
+                fontWeight: 900,
               },
             },
           },

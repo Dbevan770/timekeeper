@@ -278,13 +278,13 @@ const FormDialog = ({
             />
             <TimePicker
               label="Start Time*"
-              value={startTime}
-              onChange={(newTime) => setStartTime(newTime)}
+              value={dayjs(startTime)}
+              onChange={(newTime) => setStartTime(newTime?.toDate() ?? null)}
             />
             <TimePicker
               label="End Time*"
-              value={endTime}
-              onChange={(newTime) => setEndTime(newTime)}
+              value={dayjs(endTime)}
+              onChange={(newTime) => setEndTime(newTime?.toDate() ?? null)}
             />
           </LocalizationProvider>
           <Stack
