@@ -44,10 +44,7 @@ function Login() {
               {message}
             </Alert>
           </Snackbar>
-          <Typography
-            variant="h4"
-            sx={{ margin: "4rem auto 0 auto", maxWidth: "75%" }}
-          >
+          <Typography variant="h3" sx={{ margin: "0 auto" }}>
             TIMEKEEPER
           </Typography>
           <LoginForm

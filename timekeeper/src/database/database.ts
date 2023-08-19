@@ -18,14 +18,8 @@ import { User as FirebaseUser } from "firebase/auth";
 export interface CreateWageProps {
   totalHours: number;
   shiftDate: Date;
-  startHour: string;
-  startMinute: string;
-  startMeridian: string;
-  startTime: string;
-  endHour: string;
-  endMinute: string;
-  endMeridian: string;
-  endTime: string;
+  startTime: Date;
+  endTime: Date;
   numBreaks: number;
   breaks: { hours: string; minutes: string }[];
   breakTime: number;
@@ -38,14 +32,8 @@ export interface WageObjectProps {
   docId: string;
   totalHours: number;
   shiftDate: FirebaseTimestamp;
-  startHour: string;
-  startMinute: string;
-  startMeridian: string;
-  startTime: string;
-  endHour: string;
-  endMinute: string;
-  endMeridian: string;
-  endTime: string;
+  startTime: FirebaseTimestamp;
+  endTime: FirebaseTimestamp;
   numBreaks: number;
   breaks: { hours: string; minutes: string }[];
   breakTime: number;
@@ -76,22 +64,20 @@ export const CreateWage = async (
   user: FirebaseUser | null,
   wage: CreateWageProps
 ): Promise<QueryResult> => {
-  if (user === null)
+  console.log("Create wage called.");
+  if (user === null) {
+    console.log("You are not authenticated");
     return { success: false, error: "You are not authenticated." };
+  }
 
   let result: WageObjectProps[] = [];
 
   try {
+    console.log("Adding doc to Firebase");
     const docRef = await addDoc(collection(FIREBASE_DB, user.uid), {
       totalHours: wage.totalHours,
       shiftDate: wage.shiftDate,
-      startHour: wage.startHour,
-      startMinute: wage.startMinute,
-      startMeridian: wage.startMeridian,
       startTime: wage.startTime,
-      endHour: wage.endHour,
-      endMinute: wage.endMinute,
-      endMeridian: wage.endMeridian,
       endTime: wage.endTime,
       numBreaks: wage.numBreaks,
       breaks: wage.breaks,
@@ -100,19 +86,14 @@ export const CreateWage = async (
       totalEarned: wage.totalEarned,
       currency: wage.currency,
     });
+    console.log(docRef);
 
     const newShift: WageObjectProps = {
       docId: docRef.id,
       totalHours: wage.totalHours,
       shiftDate: FirebaseTimestamp.fromDate(wage.shiftDate),
-      startHour: wage.startHour,
-      startMinute: wage.startMinute,
-      startMeridian: wage.startMeridian,
-      startTime: wage.startTime,
-      endHour: wage.endHour,
-      endMinute: wage.endMinute,
-      endMeridian: wage.endMeridian,
-      endTime: wage.endTime,
+      startTime: FirebaseTimestamp.fromDate(wage.startTime),
+      endTime: FirebaseTimestamp.fromDate(wage.endTime),
       numBreaks: wage.numBreaks,
       breaks: wage.breaks,
       breakTime: wage.breakTime,
@@ -120,11 +101,14 @@ export const CreateWage = async (
       totalEarned: wage.totalEarned,
       currency: wage.currency,
     };
+    console.log(newShift);
 
     result.push(newShift);
+    console.log(result);
 
     return { success: true, data: result };
   } catch (err) {
+    console.log(err);
     if (err instanceof FirestoreError) {
       return { success: false, error: err.message };
     }
@@ -140,13 +124,7 @@ export const UpdateWage = async (
     await setDoc(doc(FIREBASE_DB, user.uid, wage.docId), {
       totalHours: wage.totalHours,
       shiftDate: wage.shiftDate,
-      startHour: wage.startHour,
-      startMinute: wage.startMinute,
-      startMeridian: wage.startMeridian,
       startTime: wage.startTime,
-      endHour: wage.endHour,
-      endMinute: wage.endMinute,
-      endMeridian: wage.endMeridian,
       endTime: wage.endTime,
       numBreaks: wage.numBreaks,
       breaks: wage.breaks,
@@ -266,13 +244,7 @@ export const GetFilteredWages = async (
         docId: doc.id,
         totalHours: data.totalHours,
         shiftDate: data.shiftDate,
-        startHour: data.startHour,
-        startMinute: data.startMinute,
-        startMeridian: data.startMeridian,
         startTime: data.startTime,
-        endHour: data.endHour,
-        endMinute: data.endMinute,
-        endMeridian: data.endMeridian,
         endTime: data.endTime,
         numBreaks: data.numBreaks,
         breaks: data.breaks,
@@ -300,17 +272,24 @@ export const GetWages = async (user: FirebaseUser): Promise<QueryResult> => {
 
       querySnapshot.forEach(async (doc) => {
         const data = doc.data();
+
+        // Check if startTime is a string and convert to Firebase Timestamp
+        let startTime = data.startTime;
+        if (typeof startTime === "string") {
+          startTime = FirebaseTimestamp.fromDate(parseTimeString(startTime));
+        }
+
+        // Check if endTime is a string and convert to Firebase Timestamp
+        let endTime = data.endTime;
+        if (typeof endTime === "string") {
+          endTime = FirebaseTimestamp.fromDate(parseTimeString(endTime));
+        }
+
         wages.push({
           docId: doc.id,
           totalHours: data.totalHours,
           shiftDate: data.shiftDate,
-          startHour: data.startHour,
-          startMinute: data.startMinute,
-          startMeridian: data.startMeridian,
           startTime: data.startTime,
-          endHour: data.endHour,
-          endMinute: data.endMinute,
-          endMeridian: data.endMeridian,
           endTime: data.endTime,
           numBreaks: data.numBreaks,
           breaks: data.breaks,
@@ -320,7 +299,7 @@ export const GetWages = async (user: FirebaseUser): Promise<QueryResult> => {
           currency: data.currency,
         });
       });
-
+      console.log(wages);
       return { success: true, data: wages };
     } catch (err) {
       if (err instanceof FirestoreError) {
@@ -333,6 +312,12 @@ export const GetWages = async (user: FirebaseUser): Promise<QueryResult> => {
     success: false,
     error: "You are not authenticated.",
   };
+};
+
+// A utility function to parse a string time (like "10:00AM") into a Date object
+const parseTimeString = (timeString: string): Date => {
+  const time = new Date(`1970-01-01 ${timeString}`);
+  return time;
 };
 
 export const DeleteWage = async (user: FirebaseUser, docId: string) => {

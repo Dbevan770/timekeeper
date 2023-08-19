@@ -86,7 +86,7 @@ export const LoginForm = ({
       <Typography
         variant="h5"
         sx={{
-          marginBottom: "2rem",
+          marginBottom: "1rem",
           letterSpacing: ".5rem",
           fontWeight: "300",
         }}
@@ -169,10 +169,7 @@ export const LoginForm = ({
       <Button
         variant="contained"
         type="button"
-        sx={{
-          textTransform: "none",
-          backgroundColor: "#FFFFFF",
-        }}
+        className="GoogleSignInBtn"
         disabled={loading}
         onClick={handleGoogleSignIn}
         startIcon={<GoogleLogo />}

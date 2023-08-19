@@ -14,17 +14,16 @@ import {
 } from "@mui/material";
 import { Add, Remove } from "@mui/icons-material";
 import { ThemeContext } from "../../context/ThemeContext";
-import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
+import {
+  LocalizationProvider,
+  DatePicker,
+  TimePicker,
+} from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Dayjs } from "dayjs";
 import { useState, useContext, SyntheticEvent } from "react";
-import {
-  calculateTimeDifference,
-  calculateTotalBreaks,
-  calculateEarned,
-} from "../../utils/calcHelper";
+import { calculateTotalBreaks, calculateEarned } from "../../utils/calcHelper";
 import BreakInput from "../BreakInput/BreakInput";
-import TimeInput from "../TimeInput/TimeInput";
 import dayjs from "dayjs";
 
 interface WageFormProps {
@@ -33,12 +32,8 @@ interface WageFormProps {
     shiftDate: Date | null,
     rate: string,
     currency: string,
-    startHour: string,
-    startMin: string,
-    startMeridian: string,
-    endHour: string,
-    endMin: string,
-    endMeridian: string,
+    startTime: Date | null,
+    endTime: Date | null,
     totalEarned: string,
     breaks: { hours: string; minutes: string }[]
   ) => void;
@@ -52,8 +47,6 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
   const [breakErrors, setBreakErrors] = useState<{
     [key: number]: { hours: boolean; minutes: boolean };
   }>({});
-  const [startHourError, setStartHourError] = useState<boolean>(false);
-  const [endHourError, setEndHourError] = useState<boolean>(false);
 
   const { themeMode } = useContext(ThemeContext);
   const [loading, setLoading] = useState<boolean>(false);
@@ -64,12 +57,8 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
   const [currency, setCurrency] = useState<string>(
     localStorage.getItem("defaultCurrency") || ""
   );
-  const [startHour, setStartHour] = useState<string>("");
-  const [startMin, setStartMin] = useState<string>("");
-  const [startMeridian, setStartMeridian] = useState<string>("AM");
-  const [endHour, setEndHour] = useState<string>("");
-  const [endMin, setEndMin] = useState<string>("");
-  const [endMeridian, setEndMeridian] = useState<string>("AM");
+  const [startTime, setStartTime] = useState<Dayjs | null>(null);
+  const [endTime, setEndTime] = useState<Dayjs | null>(null);
   const [breaks, setBreaks] = useState<
     Array<{ hours: string; minutes: string }>
   >([]);
@@ -138,19 +127,14 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (startHour === null || startHour === "0") {
-      setStartHourError(true);
-      openSnackbar("Start hour cannot be 0.");
-      return;
-    }
-    if (endHour === null || endHour === "0") {
-      setEndHourError(true);
-      openSnackbar("End hour cannot be 0.");
+    if (shiftDate === null) {
+      openSnackbar("Shift date cannot be empty.");
       return;
     }
 
-    if (shiftDate === null) {
-      openSnackbar("Shift date cannot be empty.");
+    if (startTime === null || endTime === null) {
+      openSnackbar("Start or End time cannot be empty");
+      return;
     }
 
     let hasError = false;
@@ -172,35 +156,21 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
 
     setLoading(true);
 
-    const totalHoursWorked = calculateTimeDifference(
-      startHour,
-      startMin,
-      startMeridian,
-      endHour,
-      endMin,
-      endMeridian
-    );
+    const totalHoursWorked = endTime.diff(startTime, "hours", true);
     const totalBreaks = calculateTotalBreaks(breaks);
     const actualHoursWorked = totalHoursWorked - totalBreaks;
     const earned = calculateEarned(actualHoursWorked, rate);
-
-    // Padding the hours and minutes to avoid single digit times in the DB
-    const paddedStartHour = startHour.padStart(2, "0");
-    const paddedStartMin = startMin.padStart(2, "0");
-    const paddedEndHour = endHour.padStart(2, "0");
-    const paddedEndMin = endMin.padStart(2, "0");
+    const dateStartTime = startTime.toDate();
+    const dateEndTime = endTime.toDate();
+    setLoading(false);
 
     onSubmit(
       actualHoursWorked,
       shiftDate,
       rate,
       currency,
-      paddedStartHour,
-      paddedStartMin,
-      startMeridian,
-      paddedEndHour,
-      paddedEndMin,
-      endMeridian,
+      dateStartTime,
+      dateEndTime,
       earned,
       breaks
     );
@@ -286,31 +256,19 @@ const WageForm = ({ onSubmit }: WageFormProps) => {
             }
             disabled={loading}
           />
+          <TimePicker
+            label="Start Time*"
+            value={startTime}
+            onChange={(newTime) => setStartTime(newTime)}
+            disabled={loading}
+          />
+          <TimePicker
+            label="End Time*"
+            value={endTime}
+            onChange={(newTime) => setEndTime(newTime)}
+            disabled={loading}
+          />
         </LocalizationProvider>
-        <TimeInput
-          label="Start Time"
-          hour={startHour}
-          setHour={setStartHour}
-          setHourError={setStartHourError}
-          min={startMin}
-          setMin={setStartMin}
-          meridian={startMeridian}
-          setMeridian={setStartMeridian}
-          hourError={startHourError}
-          disabled={loading}
-        />
-        <TimeInput
-          label="End Time"
-          hour={endHour}
-          setHour={setEndHour}
-          setHourError={setEndHourError}
-          min={endMin}
-          setMin={setEndMin}
-          meridian={endMeridian}
-          setMeridian={setEndMeridian}
-          hourError={endHourError}
-          disabled={loading}
-        />
         <Stack
           direction="row"
           justifyContent="space-between"
