@@ -9,8 +9,9 @@ import {
   Grid,
   Backdrop,
   CircularProgress,
+  IconButton,
 } from "@mui/material";
-import { Add, Home } from "@mui/icons-material";
+import { Add, Home, FilterAlt } from "@mui/icons-material";
 import { useWages } from "../../context/WagesContext";
 import Loading from "../../components/Loading/Loading";
 import DataFilterModal from "../../components/DataFilterModal/DataFilterModal";
@@ -78,15 +79,19 @@ const Dashboard = () => {
                 p: "0 1rem",
               }}
             >
-              <Typography variant="h4">Hello {user?.displayName}!</Typography>
-              <Button
-                color="secondary"
-                variant="contained"
-                sx={{ position: "relative" }}
+              <Typography variant="h4" sx={{ textAlign: "left" }} noWrap>
+                {firstDate + " - " + lastDate}
+              </Typography>
+              <IconButton
+                sx={{
+                  position: "relative",
+                  backgroundColor: "hsla(210, 80%, 40%, 0.4) !important",
+                  borderRadius: ".25rem !important",
+                }}
                 onClick={() => setOpenDataFiler(!openDataFilter)}
               >
-                {firstDate + " - " + lastDate}
-              </Button>
+                <FilterAlt sx={{ color: "#66B2FF" }} />
+              </IconButton>
               <DataFilterModal openDataFilter={openDataFilter} />
             </Box>
             {wages.length > 0 ? (

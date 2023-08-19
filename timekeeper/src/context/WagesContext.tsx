@@ -79,26 +79,35 @@ export const WagesProvider = ({ children }: { children: ReactNode }) => {
     getWages();
   }, [getWages]);
 
-  interface WageWithDocId extends Omit<CreateWageProps, "shiftDate"> {
+  interface WageWithDocId
+    extends Omit<CreateWageProps, "shiftDate" | "startTime" | "endTime"> {
     docId: string;
     shiftDate: Timestamp;
+    startTime: Timestamp;
+    endTime: Timestamp;
   }
 
   const addWage = async (wage: CreateWageProps) => {
+    console.log("Add wage called");
     const tempId = uuidv4();
     const tempWage: WageWithDocId = {
       docId: tempId,
       ...wage,
       shiftDate: Timestamp.fromDate(wage.shiftDate),
+      startTime: Timestamp.fromDate(wage.startTime),
+      endTime: Timestamp.fromDate(wage.endTime),
     };
     // Optimistically update the state.
     setWages((prevWages) => sortWages([...prevWages, tempWage]));
+    console.log("Optimistic Update complete");
 
     try {
       const newWage = await CreateWage(user, wage);
       if (!newWage.success) {
+        console.log("Adding new wage failed");
         return { success: false, msg: newWage.error || "An error occurred." };
       } else if (newWage.success && newWage.data) {
+        console.log("Adding a new wage was successful");
         const newWageData = newWage.data[0];
         setWages((prevWages) =>
           sortWages(

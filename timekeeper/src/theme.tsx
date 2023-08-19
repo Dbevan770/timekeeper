@@ -137,6 +137,14 @@ const getTheme = (mode: "light" | "dark") => {
               borderColor: "rgba(255,255,255,0.23)",
             },
           },
+          contained: {
+            "&.GoogleSignInBtn": {
+              backgroundColor: "#ffffff",
+              textTransform: "none",
+              boxShadow: mode === "dark" ? "none" : "hsla(0, 0%, 0%, 0.2)",
+              color: "hsl(0,0%, 5%)",
+            },
+          },
         },
       },
       MuiButtonBase: {

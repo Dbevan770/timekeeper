@@ -13,17 +13,16 @@ import {
 import { Add, Remove } from "@mui/icons-material";
 import { useWages } from "../../context/WagesContext";
 import { WageObjectProps } from "../../database/database";
-import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
+import {
+  LocalizationProvider,
+  DatePicker,
+  TimePicker,
+} from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Dayjs } from "dayjs";
 import { useState } from "react";
-import {
-  calculateTimeDifference,
-  calculateEarned,
-  calculateTotalBreaks,
-} from "../../utils/calcHelper";
+import { calculateEarned, calculateTotalBreaks } from "../../utils/calcHelper";
 import BreakInput from "../BreakInput/BreakInput";
-import TimeInput from "../TimeInput/TimeInput";
 import dayjs from "dayjs";
 import { Timestamp } from "firebase/firestore";
 
@@ -36,6 +35,34 @@ interface FormDialogProps {
   setSeverity: React.Dispatch<React.SetStateAction<"error" | "success">>;
 }
 
+// Functions to support legacy time strings in Firebase
+const timeStringToDate = (time: string): Date => {
+  const today = new Date();
+  const [_, hours, minutes, period] = time.match(/(\d+):(\d+)(\w+)/) || [];
+
+  let hourNumber = parseInt(hours ?? "");
+  if (period.toUpperCase() === "PM" && hourNumber !== 12) {
+    hourNumber += 12;
+  } else if (period.toUpperCase() === "AM" && hourNumber === 12) {
+    hourNumber = 0;
+  }
+
+  today.setHours(hourNumber, parseInt(minutes), 0);
+
+  return today;
+};
+
+// Convert either legacy data or current data to Date object
+const convertToDate = (input: any): Date | null => {
+  if (typeof input === "string") {
+    return timeStringToDate(input);
+  } else if (input && "seconds" in input) {
+    return new Timestamp(input.seconds, input.nanoseconds).toDate();
+  } else {
+    return null;
+  }
+};
+
 const FormDialog = ({
   open,
   setOpen,
@@ -46,20 +73,18 @@ const FormDialog = ({
 }: FormDialogProps) => {
   const [currency, setCurrency] = useState(wageItem.currency);
   const [rate, setRate] = useState<string>(wageItem.rate.toString());
+  const [startTime, setStartTime] = useState<Date | null>(
+    convertToDate(wageItem.startTime)
+  );
+  const [endTime, setEndTime] = useState<Date | null>(
+    convertToDate(wageItem.endTime)
+  );
   const [shiftDate, setShiftDate] = useState<Date | null>(
     wageItem.shiftDate.toDate()
   );
-  const [startHour, setStartHour] = useState(wageItem.startHour);
-  const [startMin, setStartMin] = useState(wageItem.startMinute);
-  const [startMeridian, setStartMeridian] = useState(wageItem.startMeridian);
-  const [endHour, setEndHour] = useState(wageItem.endHour);
-  const [endMin, setEndMin] = useState(wageItem.endMinute);
-  const [endMeridian, setEndMeridian] = useState(wageItem.endMeridian);
   const [breaks, setBreaks] = useState<
     Array<{ hours: string; minutes: string }>
   >(wageItem.breaks);
-  const [startHourError, setStartHourError] = useState(false);
-  const [endHourError, setEndHourError] = useState(false);
   const [breakErrors, setBreakErrors] = useState<{
     [key: number]: { hours: boolean; minutes: boolean };
   }>({});
@@ -111,24 +136,16 @@ const FormDialog = ({
   };
 
   const handleSave = async () => {
-    if (startHour === null || startHour === "0") {
-      setStartHourError(true);
+    if (shiftDate === null) {
       openSnackbar(true);
-      setMessage("Start Hour cannot be empty or 0.");
-      setSeverity("error");
-      return;
-    }
-    if (endHour === null || endHour === "0") {
-      setEndHourError(true);
-      openSnackbar(true);
-      setMessage("End Hour cannot be empty or 0.");
+      setMessage("Shift Date cannot be empty.");
       setSeverity("error");
       return;
     }
 
-    if (shiftDate === null) {
+    if (startTime === null || endTime === null) {
       openSnackbar(true);
-      setMessage("Shift Date cannot be empty.");
+      setMessage("Start or end time cannot be null");
       setSeverity("error");
       return;
     }
@@ -153,26 +170,15 @@ const FormDialog = ({
     }
 
     setDisabled(true);
-    const totalHoursWorked = calculateTimeDifference(
-      startHour,
-      startMin,
-      startMeridian,
-      endHour,
-      endMin,
-      endMeridian
+    const totalHoursWorked = dayjs(endTime).diff(
+      dayjs(startTime),
+      "hours",
+      true
     );
     const totalBreaks = calculateTotalBreaks(breaks);
     const actualHoursWorked = totalHoursWorked - totalBreaks;
     const earned = calculateEarned(actualHoursWorked, rate);
 
-    // Padding the hours and minutes to avoid single digit times in the DB
-    const paddedStartHour = startHour.padStart(2, "0");
-    const paddedStartMin = startMin.padStart(2, "0");
-    const paddedEndHour = endHour.padStart(2, "0");
-    const paddedEndMin = endMin.padStart(2, "0");
-
-    const startTime = `${paddedStartHour}:${paddedStartMin}${startMeridian}`;
-    const endTime = `${paddedEndHour}:${paddedEndMin}${endMeridian}`;
     try {
       const updatedWageItem: WageObjectProps = {
         ...wageItem,
@@ -180,16 +186,10 @@ const FormDialog = ({
         currency: currency,
         rate: parseFloat(rate),
         shiftDate: Timestamp.fromDate(shiftDate!),
-        startHour: paddedStartHour,
-        startMinute: paddedStartMin,
-        startMeridian: startMeridian,
-        startTime: startTime,
+        startTime: Timestamp.fromDate(startTime),
         breaks: breaks,
         numBreaks: totalBreaks,
-        endHour: paddedEndHour,
-        endMinute: paddedEndMin,
-        endMeridian: endMeridian,
-        endTime: endTime,
+        endTime: Timestamp.fromDate(endTime),
         totalEarned: parseFloat(earned),
       };
 
@@ -276,31 +276,17 @@ const FormDialog = ({
                 setShiftDate(date?.toDate() ?? null)
               }
             />
+            <TimePicker
+              label="Start Time*"
+              value={startTime}
+              onChange={(newTime) => setStartTime(newTime)}
+            />
+            <TimePicker
+              label="End Time*"
+              value={endTime}
+              onChange={(newTime) => setEndTime(newTime)}
+            />
           </LocalizationProvider>
-          <TimeInput
-            label="Start Time"
-            hour={startHour}
-            setHour={setStartHour}
-            setHourError={setStartHourError}
-            min={startMin}
-            setMin={setStartMin}
-            meridian={startMeridian}
-            setMeridian={setStartMeridian}
-            hourError={startHourError}
-            disabled={disabled}
-          />
-          <TimeInput
-            label="End Time"
-            hour={endHour}
-            setHour={setEndHour}
-            setHourError={setEndHourError}
-            min={endMin}
-            setMin={setEndMin}
-            meridian={endMeridian}
-            setMeridian={setEndMeridian}
-            hourError={endHourError}
-            disabled={disabled}
-          />
           <Stack
             direction="row"
             justifyContent="space-between"

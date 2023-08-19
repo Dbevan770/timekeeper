@@ -15,12 +15,8 @@ const AddShift = () => {
   const [totalHours, setTotalHours] = useState<number>(0);
   const [shiftDate, setShiftDate] = useState<Date | null>(null);
   const [rate, setRate] = useState<string>("");
-  const [startHour, setStartHour] = useState<string>("");
-  const [startMin, setStartMin] = useState<string>("");
-  const [startMeridian, setStartMeridian] = useState<string>("");
-  const [endHour, setEndHour] = useState<string>("");
-  const [endMin, setEndMin] = useState<string>("");
-  const [endMeridian, setEndMeridian] = useState<string>("");
+  const [startTime, setStartTime] = useState<Date | null>(null);
+  const [endTime, setEndTime] = useState<Date | null>(null);
   const [breaks, setBreaks] = useState<
     Array<{ hours: string; minutes: string }>
   >([]);
@@ -33,12 +29,8 @@ const AddShift = () => {
     shiftDate: Date | null,
     rate: string,
     currency: string,
-    startHour: string,
-    startMin: string,
-    startMeridian: string,
-    endHour: string,
-    endMin: string,
-    endMeridian: string,
+    startTime: Date | null,
+    endTime: Date | null,
     totalEarned: string,
     breaks: { hours: string; minutes: string }[]
   ) => {
@@ -48,12 +40,7 @@ const AddShift = () => {
     setCurrency(currency);
     setTotalEarned(totalEarned);
     setRate(rate);
-    setStartHour(startHour);
-    setStartMin(startMin);
-    setStartMeridian(startMeridian);
-    setEndHour(endHour);
-    setEndMin(endMin);
-    setEndMeridian(endMeridian);
+    setStartTime(startTime), setEndTime(endTime);
     setBreaks(breaks);
   };
 
@@ -64,37 +51,25 @@ const AddShift = () => {
     setCurrency("");
     setTotalEarned("");
     setRate("");
-    setStartHour("");
-    setStartMin("");
-    setStartMeridian("");
-    setEndHour("");
-    setEndMin("");
-    setEndMeridian("");
+    setStartTime(null);
+    setEndTime(null);
     setBreaks([]);
   };
 
   const handleSave = async () => {
     setLoading(true);
-    const startTime = `${startHour}:${startMin}${startMeridian}`;
-    const endTime = `${endHour}:${endMin}${endMeridian}`;
     const totalBreaks = breaks.length;
     const totalBreakTime = breaks.reduce((acc, curr) => {
       const breakHours = parseInt(curr.hours) || 0;
       const breakMinutes = parseInt(curr.minutes) || 0;
       return acc + breakHours * 60 + breakMinutes;
     }, 0);
-    if (!shiftDate) return;
+    if (!shiftDate || !startTime || !endTime) return;
     try {
       const wage: CreateWageProps = {
         totalHours: totalHours,
         shiftDate: shiftDate,
-        startHour: startHour,
-        startMinute: startMin,
-        startMeridian: startMeridian,
         startTime: startTime,
-        endHour: endHour,
-        endMinute: endMin,
-        endMeridian: endMeridian,
         endTime: endTime,
         numBreaks: totalBreaks,
         breaks: breaks,
